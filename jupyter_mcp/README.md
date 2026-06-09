@@ -93,10 +93,10 @@ hook.register()
 
 **.py + Console 模式专用：**
 
-| 工具 | 功能 |
-|----|----|
-| `read_source` | 读取当前 .py 源码文件 |
-| `write_source` | 覆盖写入 .py 源码文件 |
+| 工具            | 功能                        |
+|-----------------|-----------------------------|
+| `read_source`   | 读取当前 .py 源码文件       |
+| `write_source`  | 覆盖写入 .py 源码文件       |
 | `append_source` | 追加代码到 .py 源码文件末尾 |
 
 ### 5. 手动启动测试（调试用）
@@ -112,7 +112,7 @@ python3 jupyter-mcp-server.py
 
 ## 为什么推荐 stdio 模式
 
-| | **stdio 模式（推荐）** | **HTTP / SSE 模式** |
+|   | **stdio 模式（推荐）** | HTTP / SSE 模式 |
 |----|----|----|
 | **通信方式** | OpenClaw 以子进程启动 MCP Server，通过 stdin/stdout 通信 | MCP Server 监听网络端口，通过 HTTP / SSE 通信 |
 | **端口冲突** | 无。每个用户有独立的 OS 进程，不占用任何端口 | 有。多用户需分配不同端口，管理复杂 |
@@ -125,8 +125,8 @@ python3 jupyter-mcp-server.py
 
 ## 注意事项
 
--   **只能连接一个 kernel。** 如果你有多个 Jupyter Lab Tab，保证只在你想要的 kernel 中运行 `hook.register(``force=True``)`
--   **注册过的 kernel 如果重启了，** 需要重新运行 `hook.register(``force=True``)`
+-   **只能连接一个 kernel。** 如果你有多个 Jupyter Lab Tab，保证只在你想要的 kernel 中运行 ``` hook.register(``force=True``) ```
+-   **注册过的 kernel 如果重启了，** 需要重新运行 ``` hook.register(``force=True``) ```
 -   MCP 服务器和 kernel 在同一台机器上即可（都是本地 127.0.0.1 连接）
 -   如果 MCP Server 启动时提示找不到 kernel，检查 `~/.jupyter-mcp/current` 是否存在
 
