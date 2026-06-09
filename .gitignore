@@ -28,9 +28,15 @@ venv/
 .DS_Store
 Thumbs.db
 
+# TypeScript build cache
+*.tsbuildinfo
+
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# Node
+node_modules/

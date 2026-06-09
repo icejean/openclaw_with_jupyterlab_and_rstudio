@@ -1,0 +1,30 @@
+{
+  "name": "jupyterlab-auto-reload",
+  "version": "0.1.0",
+  "description": "自动刷新 Notebook（OpenClaw MCP 集成）",
+  "keywords": ["jupyter", "jupyterlab", "jupyterlab-extension"],
+  "license": "MIT",
+  "files": ["lib/**/*.{d.ts,js,js.map,json,png}"],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "jlpm run build:lib && jlpm run build:labextension",
+    "build:lib": "tsc",
+    "build:labextension": "jupyter labextension build .",
+    "clean": "rimraf lib jupyterlab_auto_reload/labextension"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "~4.3.4",
+    "@jupyterlab/notebook": "~4.3.4"
+  },
+  "devDependencies": {
+    "@jupyterlab/builder": "~4.3.4",
+    "rimraf": "^5.0.10",
+    "typescript": "~5.0.0"
+  },
+  "sideEffects": ["style/*"],
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "jupyterlab_auto_reload/labextension"
+  }
+}
