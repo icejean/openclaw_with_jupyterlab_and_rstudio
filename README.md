@@ -176,7 +176,10 @@ openclaw_with_jupyterlab_and_rstudio/
 ├── MEMORY.md                        # ⚠️ OpenClaw AI Agent 长期记忆样本
 │                                    #   告诉 AI 如何驱动这套环境的操作指南
 │                                    #   克隆后应替换为你自己的配置
-├── openclaw.json                    # OpenClaw（工具 & MCP）配置
+├── openclaw.json                    # ⚠️ OpenClaw 用户示例配置文件
+│                                    #   MCP Server / 工具注册配置
+│                                    #   包括 jupyter-mcp、r-session 等连接参数
+│                                    #   克隆后需按自己的环境修改
 └── README.md                        # ← 你在这里
 ```
 
@@ -315,7 +318,7 @@ cd openclaw_with_jupyterlab_and_rstudio
 1. **启动环境：** 打开 JupyterLab 和 RStudio
 2. **注册 Python 端：** 在 Jupyter cell 中运行 `hook.register()`
 3. **启动 R API：** 在 RStudio Console 中 `source("r-session-ai/r-session-api.R")`
-4. **连接 OpenClaw：** 确保 `openclaw.json` 中 MCP Server 配置正确
+4. **配置 OpenClaw：** 按自己的环境修改 `openclaw.json` 中的 MCP Server 参数
 5. **开始分析：** 在 OpenClaw 对话中发号施令
 
 ---
