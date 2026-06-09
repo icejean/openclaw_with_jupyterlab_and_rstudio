@@ -319,14 +319,14 @@ cd openclaw_with_jupyterlab_and_rstudio
 
 | 主题 | 链接 |
 |---|---|
-| 🦞 小龙虾 OpenClaw 安全饲养教程（一） | [本机部署起步](https://zhuanlan.zhihu.com/p/2013144472117068259) |
-| 🦞 小龙虾 OpenClaw 安全饲养教程（二） | [本机部署进阶](https://zhuanlan.zhihu.com/p/2020880761520227367) |
-| 💬 主流通讯渠道配置指南（一） | [Telegram / Discord / Signal 等](https://zhuanlan.zhihu.com/p/2041198920395658076) |
-| 💬 主流通讯渠道配置指南（二） | [多通道配置详解](https://zhuanlan.zhihu.com/p/2044067725241210044) |
-| 🧪 Jupyter + OpenClaw + Claude Code | [Vibe Coding & AI 辅助数据分析](https://zhuanlan.zhihu.com/p/2045196634368242170) |
-| 📈 RStudio + OpenClaw | [Vibe Coding 与数据分析](https://zhuanlan.zhihu.com/p/2026562226463482280) |
-| 🏗️ Ubuntu 24 多用户部署方案（一） | [基础架构](https://zhuanlan.zhihu.com/p/2046116340784697542) |
-| 🏗️ Ubuntu 24 多用户部署方案（二） | [生产级增强](https://zhuanlan.zhihu.com/p/2046909112571662596) |
+| 🦞 小龙虾 OpenClaw 安全饲养教程 | [入门篇](https://zhuanlan.zhihu.com/p/2013144472117068259) |
+| 🦞 小龙虾 OpenClaw 安全饲养教程之二：本机部署 | [部署篇](https://zhuanlan.zhihu.com/p/2020880761520227367) |
+| 💬 OpenClaw 主流通讯渠道配置指南 | [Telegram / Discord / Signal 等](https://zhuanlan.zhihu.com/p/2041198920395658076) |
+| 🧪 JupyterHub + OpenClaw + Claude Code Vibe Coding | [Vibe Coding 实战](https://zhuanlan.zhihu.com/p/2026562226463482280) |
+| 📊 Jupyter Lab + OpenClaw AI 辅助数据分析 | [数据分析实战](https://zhuanlan.zhihu.com/p/2045196634368242170) |
+| 📈 RStudio + OpenClaw Vibe Coding & 数据分析 | [R 语言实战](https://zhuanlan.zhihu.com/p/2044067725241210044) |
+| 🏗️ OpenClaw Ubuntu 24 多用户部署方案 | [基础架构](https://zhuanlan.zhihu.com/p/2046116340784697542) |
+| 🏗️ OpenClaw Ubuntu 24 多用户部署方案生产级增强 | [生产级增强](https://zhuanlan.zhihu.com/p/2046909112571662596) |
 
 ---
 
