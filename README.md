@@ -2,7 +2,7 @@
 
 > OpenClaw / Claude Code with Jupyter Lab and Rstudio
 
-一体化的 **Python + R** 数据分析工作台，以 **OpenClaw AI Agent** 为大脑，串联 **JupyterLab (Python)** 和 **RStudio (R)** 两个交互式分析引擎，通过 **MCP 协议**统一工具接口，实现跨语言数据流无缝流转。
+一体化的 **Python + R** 数据分析工作台，以 **OpenClaw AI Agent** 为大脑，串联 **JupyterLab (Python)** 和 **RStudio (R)** 两个交互式分析引擎，通过 **MCP 协议**统一工具接口，实现跨语言数据流无缝流转。自然语言指挥，手机、浏览器等多渠道接入，数据分析简单易用无门槛。
 
 ------------------------------------------------------------------------
 
