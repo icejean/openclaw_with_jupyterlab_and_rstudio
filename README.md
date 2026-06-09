@@ -413,6 +413,22 @@ jupyter labextension list
 | 🏗️ OpenClaw Ubuntu 24 多用户部署方案 | [基础架构](https://zhuanlan.zhihu.com/p/2046116340784697542) |
 | 🏗️ OpenClaw Ubuntu 24 多用户部署方案生产级增强 | [生产级增强](https://zhuanlan.zhihu.com/p/2046909112571662596) |
 
+### 安全总览
+
+系统在生产环境中的安全措施涵盖以下层面：
+
+| 层面 | 措施 | 说明 |
+|----|----|----|
+| **网络** | 仅绑定 `127.0.0.1` | R API、MCP Server（stdio 模式无网络端口）、Jupyter MCP 均只监听本地回环地址 |
+| **认证** | Bearer Token | R API 所有请求验证 Token，`openclaw.json` 中 MCP Server 配置相同 Token，不匹配返回 401 |
+| **进程** | stdio 子进程隔离 | 每个用户的 MCP Server 是独立 OS 子进程，互不可见，不占用任何网络端口 |
+| **工作区** | 用户目录隔离 | 每个用户的工作区、共享目录（r2py）、MCP 注册文件均在各自 home 下，天然隔离 |
+| **代理** | 自动清理 | MCP Server 启动时自动清除代理环境变量，避免 `ALL_PROXY=socks5` 导致 httpx 崩溃 |
+| **数据** | 数据不出境 | 全程内网通信，CSV 写入本地硬盘，不经过任何外部服务 |
+| **Token 存储** | 内存驻留 | R API Token 通过 `options()` 设置在 R 内存中，不落盘；配置文件中的 Token 由 OpenClaw 管理 |
+
+> 详细 Token 认证流程参见 [r-session-ai/README.md](./r-session-ai/README.md#安全加固) 的安全加固章节。
+
 ------------------------------------------------------------------------
 
 ## 端到端示例
