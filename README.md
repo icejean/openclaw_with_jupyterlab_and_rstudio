@@ -27,20 +27,20 @@ Python 和 R 各有不可替代的生态。传统方案（如 Posit/Quarto）侧
 
 ```         
                           ┌──────────────────────┐
-                          │  用户（浏览器界面）   │
+                          │  用户（浏览器界面）  │
                           │ JupyterLab / RStudio │
                           └──────────┬───────────┘
                                      │
                           ┌──────────▼───────────┐
                           │    OpenClaw Agent    │  ← AI 大脑
-                          │对话 + 指令路由 + MCP  │  ← 所有工具通过 MCP 协议暴露
+                          │对话 + 指令路由 + MCP │  ← 所有工具通过 MCP 协议暴露
                           └──┬───────────────┬───┘
                              │               │
               ┌──────────────▼──┐    ┌───────▼─────────────┐
               │ MCP Server      │    │  MCP Server         │
               │ jupyter-mcp     │    │  r-session          │
               │ (Python)        │    │  (Python)           │
-              │ ZMQ 直连 kernel │    │  HTTP 调用 R API     │
+              │ ZMQ 直连 kernel │    │  HTTP 调用 R API    │
               └──────┬──────────┘    └──────┬──────────────┘
                      │                      │
               ┌──────▼─────────┐    ┌───────▼──────────────┐
@@ -322,9 +322,9 @@ cd openclaw_with_jupyterlab_and_rstudio
 将扩展安装到 Jupyter 系统级 labextensions 目录，适合 JupyterHub 多用户环境：
 
 ``` bash
-# 方式一：直接复制到系统目录
-sudo cp -r labextensions/jupyterlab-auto-reload /usr/share/jupyter/labextensions/
-sudo cp -r labextensions/jupyterlab-console-adopt /usr/share/jupyter/labextensions/
+# 方式一：直接复制到系统目录（比如conda base环境）
+sudo cp -r labextensions/jupyterlab-auto-reload /usr/lib64/anaconda3/share/jupyter/labextensions/
+sudo cp -r labextensions/jupyterlab-console-adopt /usr/lib64/anaconda3/share/jupyter/labextensions/
 
 # 方式二：通过 jupyter 命令安装（会自动处理 symlink）
 jupyter labextension install labextensions/jupyterlab-auto-reload
