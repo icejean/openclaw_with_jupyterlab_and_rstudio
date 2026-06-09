@@ -183,8 +183,13 @@ openclaw_with_jupyterlab_and_rstudio/
 │   ├── package.json                 #    npm 依赖与构建脚本
 │   └── tsconfig.json                #    TypeScript 配置
 │
-├── example/                         # 端到端示例：墨尔本房价预测（22 步手机截图）
-│   └── README.md                    #    示例说明
+├── example/                         # 端到端示例：墨尔本房价 LightGBM 预测
+│   ├── README.md                    #    示例说明
+│   ├── Melbourne_housing_FULL.csv   #    Kaggle 原始数据集
+│   ├── Melbourne_housing_Pre.py     #    数据预处理程序
+│   ├── Melbourne_housing_pre.csv    #    预处理后数据
+│   ├── Melbourne_housing_LGBM.py    #    LightGBM 训练与调优
+│   └── demo-*.png                   #    22 步手机截图
 │
 ├── .gitignore
 ├── MEMORY.md                        # ⚠️ OpenClaw AI Agent 长期记忆样本
@@ -468,20 +473,34 @@ jupyter labextension list
 
 ## 端到端示例
 
-> 墨尔本房价预测 —— 全程在手机微信中指挥 OpenClaw 完成，无需手动编写一行代码。
+> 墨尔本房价预测——传统机器学习（LightGBM）与大模型 AI（OpenClaw）的深度融合
+>
+> 全程在手机微信中指挥 OpenClaw 完成，零代码手动编写。
 
-**工作流：** RStudio 加载房价数据 → 观察/统计/作图 → 传 CSV 到 Jupyter Lab → 划分训练/测试集 → LightGBM 回归建模 → 预测 → 传回 RStudio → 作图对比真实值 vs 预测值
+**数据来源：** [Kaggle：Melbourne Housing Market](https://www.kaggle.com/datasets/anthonypino/melbourne-housing-market)（约 35,000 条房产交易记录）
 
-共 22 步，每步含手机截图，详见 [`example/`](./example/README.md)。
+**工作流：** 数据预处理 → RStudio 加载房价数据 → 观察/统计/作图 → 传 CSV 到 Jupyter Lab → LightGBM 回归建模 → 预测 → 传回 RStudio → 作图对比真实值 vs 预测值
+
+```
+传统 ML 代码（预处理 + 模型调优）
+    │
+    ▼
+OpenClaw 大模型 AI 调度（22 步）
+    ├── RStudio 端：数据探索、可视化
+    ├── Jupyter Lab 端：LightGBM 训练、预测
+    └── RStudio 端：结果对比作图
+```
 
 | 阶段 | 工具 | 步骤 |
 |----|----|----|
-| 数据探索与可视化 | RStudio (r-session) | 2-7 |
-| 导出数据到 Python | r-session.export_data → CSV | 8 |
-| 数据导入与探索 | Jupyter Lab (jupyter-mcp) | 9-10 |
-| 训练测试集划分 → LightGBM 建模 → 预测 | Jupyter Lab (jupyter-mcp) | 11-17 |
-| 导回预测结果到 R | jupyter-mcp.export_data → CSV | 18 |
-| 结果导入与对比作图 | RStudio (r-session) | 19-22 |
+| RStudio EDA：加载/预览/统计/作图 | r-session | 1-7 |
+| R → CSV 导出 | r-session.export_data | 8 |
+| CSV → Python 导入 | jupyter-mcp.import_data | 9-10 |
+| LightGBM 建模 → 调优 → 预测 | jupyter-mcp.run_code | 11-17 |
+| Python → CSV 导出 | jupyter-mcp.export_data | 18 |
+| CSV → R 导入 → 对比作图 | r-session.import_data / run_code | 19-22 |
+
+完整代码、数据、22 步手机截图详见 [`example/`](./example/README.md)。
 
 ------------------------------------------------------------------------
 
