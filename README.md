@@ -27,20 +27,20 @@ Python 和 R 各有不可替代的生态。传统方案（如 Posit/Quarto）侧
 
 ```         
                           ┌──────────────────────┐
-                          │  用户（浏览器界面）  │
+                          │  用户（浏览器界面）   │
                           │ JupyterLab / RStudio │
                           └──────────┬───────────┘
                                      │
                           ┌──────────▼───────────┐
                           │    OpenClaw Agent    │  ← AI 大脑
-                          │对话 + 指令路由 + MCP │  ← 所有工具通过 MCP 协议暴露
+                          │对话 + 指令路由 + MCP  │  ← 所有工具通过 MCP 协议暴露
                           └──┬───────────────┬───┘
                              │               │
               ┌──────────────▼──┐    ┌───────▼─────────────┐
               │ MCP Server      │    │  MCP Server         │
               │ jupyter-mcp     │    │  r-session          │
               │ (Python)        │    │  (Python)           │
-              │ ZMQ 直连 kernel │    │  HTTP 调用 R API    │
+              │ ZMQ 直连 kernel │    │  HTTP 调用 R API     │
               └──────┬──────────┘    └──────┬──────────────┘
                      │                      │
               ┌──────▼─────────┐    ┌───────▼──────────────┐
@@ -312,6 +312,43 @@ cd openclaw_with_jupyterlab_and_rstudio
 |------------------------|------------------------|------------------------|
 | `jupyter_mcp/` | [README.md](./jupyter_mcp/README.md) | Jupyter MCP 安装与注册 |
 | `r-session-ai/` | [README.md](./r-session-ai/README.md) | R API 启动与 MCP 配置 |
+
+### JupyterLab 扩展安装
+
+本仓库包含两个预编译的 JupyterLab 4.x 扩展（位于 `labextensions/`），支持两种安装方式：
+
+#### 全局安装（所有用户生效）
+
+将扩展安装到 Jupyter 系统级 labextensions 目录，适合 JupyterHub 多用户环境：
+
+``` bash
+# 方式一：直接复制到系统目录
+sudo cp -r labextensions/jupyterlab-auto-reload /usr/share/jupyter/labextensions/
+sudo cp -r labextensions/jupyterlab-console-adopt /usr/share/jupyter/labextensions/
+
+# 方式二：通过 jupyter 命令安装（会自动处理 symlink）
+jupyter labextension install labextensions/jupyterlab-auto-reload
+jupyter labextension install labextensions/jupyterlab-console-adopt
+```
+
+#### 用户局部安装（仅当前用户生效）
+
+适合单用户场景，无需 sudo：
+
+``` bash
+# 复制到用户本地扩展目录
+cp -r labextensions/jupyterlab-auto-reload ~/.local/share/jupyter/labextensions/
+cp -r labextensions/jupyterlab-console-adopt ~/.local/share/jupyter/labextensions/
+```
+
+#### 验证安装
+
+``` bash
+jupyter labextension list
+# 应看到两个扩展均在列表中
+```
+
+安装完成后需重启 JupyterLab 才能生效。如果使用 JupyterHub，重启对应的 user server 即可。
 
 ### 参考教程
 
