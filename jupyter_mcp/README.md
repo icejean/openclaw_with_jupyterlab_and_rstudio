@@ -82,7 +82,7 @@ hook.register()
 连接到 OpenClaw 后，你可以使用以下工具操作 Jupyter kernel:
 
 | 工具 | 功能 |
-|----|----|
+|------------------------------------|------------------------------------|
 | `run_code` | 在 kernel 中执行 Python 代码，修改变量 |
 | `list_objects` | 列出 kernel 中所有变量及类型/大小 |
 | `preview_data` | 预览变量详情（DataFrame 的 shape/dtypes/head/describe/缺失值） |
@@ -113,7 +113,7 @@ python3 jupyter-mcp-server.py
 ## 为什么推荐 stdio 模式
 
 |   | **stdio 模式（推荐）** | HTTP / SSE 模式 |
-|----|----|----|
+|-------------|-------------|-----------------------------------------------|
 | **通信方式** | OpenClaw 以子进程启动 MCP Server，通过 stdin/stdout 通信 | MCP Server 监听网络端口，通过 HTTP / SSE 通信 |
 | **端口冲突** | 无。每个用户有独立的 OS 进程，不占用任何端口 | 有。多用户需分配不同端口，管理复杂 |
 | **安全问题** | 无网络暴露，子进程天然隔离，用户间互不可见 | 端口开放即有潜在网络攻击面 |
@@ -125,8 +125,8 @@ python3 jupyter-mcp-server.py
 
 ## 注意事项
 
--   **只能连接一个 kernel。** 如果你有多个 Jupyter Lab Tab，保证只在你想要的 kernel 中运行 ``` hook.register(``force=True``) ```
--   **注册过的 kernel 如果重启了，** 需要重新运行 ``` hook.register(``force=True``) ```
+-   **只能连接一个 kernel。** 如果你有多个 Jupyter Lab Tab，保证只在你想要的 kernel 中运行 `hook.register(force=True)`
+-   **注册过的 kernel 如果重启了，** 需要重新运行 `hook.register(force=True)`
 -   MCP 服务器和 kernel 在同一台机器上即可（都是本地 127.0.0.1 连接）
 -   如果 MCP Server 启动时提示找不到 kernel，检查 `~/.jupyter-mcp/current` 是否存在
 
