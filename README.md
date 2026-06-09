@@ -313,6 +313,28 @@ cd openclaw_with_jupyterlab_and_rstudio
 | `jupyter_mcp/` | [README.md](./jupyter_mcp/README.md) | Jupyter MCP 安装与注册 |
 | `r-session-ai/` | [README.md](./r-session-ai/README.md) | R API 启动与 MCP 配置 |
 
+### 推荐使用方式
+
+#### 1. OpenClaw 运行模式
+
+推荐使用 `openclaw chat` **embedded agent 模式**（非网关/Plugin 模式），在 RStudio Server IDE 或 Jupyter Lab 内置的 **Terminal** 中直接启动：
+
+``` bash
+openclaw chat
+```
+
+这种方式下 OpenClaw 以内嵌进程运行，**不启动网关和 Plugin**，每个用户的工作空间天然完全隔离，无需管理端口和进程，非常适合多用户部署。
+
+#### 2. 浏览器建议
+
+**推荐使用 Firefox 浏览器。** Chrome 浏览器在 Terminal 中处理中文输入法存在已知问题——全角标点会连续触发两次输入，影响编码和命令行操作效率。
+
+#### 3. R ↔ Python 数据交换范围
+
+RStudio 和 Jupyter Lab 之间通过 CSV 文件交换数据时，仅适用于**小规模的中间数据集**。大数据集应留在原 session 中处理，避免 I/O 和类型转换开销。
+
+---
+
 ### JupyterLab 扩展安装
 
 本仓库包含两个预编译的 JupyterLab 4.x 扩展（位于 `labextensions/`），支持两种安装方式：
