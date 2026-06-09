@@ -1,6 +1,6 @@
-# OpenClaw + JupyterLab + RStudio
+# Data AI
 
-> Python & R 双语 AI 数据分析环境 —— Fast-Python-AI，平替 Posit AI
+> OpenClaw / Claude Code with Jupyter Lab and Rstudio
 
 一体化的 **Python + R** 数据分析工作台，以 **OpenClaw AI Agent** 为大脑，串联 **JupyterLab (Python)** 和 **RStudio (R)** 两个交互式分析引擎，通过 **MCP 协议**统一工具接口，实现跨语言数据流无缝流转。
 
@@ -545,4 +545,4 @@ MIT
 
 ------------------------------------------------------------------------
 
-> *🐵 Jean出品 —— 让 Python 和 R 在 AI 驱动下高效协作*
+> Data AI —— 让 Python 和 R 在 AI 驱动下高效协作
