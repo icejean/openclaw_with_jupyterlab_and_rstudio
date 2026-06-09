@@ -1,0 +1,44 @@
+{
+  "name": "jupyterlab-console-adopt",
+  "version": "0.1.0",
+  "description": "在 Console 中显示 MCP/外部客户端执行的代码和输出",
+  "packageManager": "yarn@3.5.0",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "license": "MIT",
+  "files": [
+    "lib/**/*.{d.ts,js,js.map,json,png}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "jlpm run build:lib && jlpm run build:labextension",
+    "build:lib": "tsc",
+    "build:labextension": "jupyter labextension build .",
+    "clean": "rimraf lib jupyterlab_console_adopt/labextension"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "~4.3.4",
+    "@jupyterlab/cells": "~4.3.4",
+    "@jupyterlab/console": "~4.3.4"
+  },
+  "devDependencies": {
+    "@jupyterlab/builder": "~4.3.4",
+    "rimraf": "^5.0.10",
+    "typescript": "~5.0"
+  },
+  "sideEffects": [
+    "style/*"
+  ],
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "jupyterlab_console_adopt/labextension",
+    "_build": {
+      "load": "static/remoteEntry.03ca90fbe3d8ff858ee8.js",
+      "extension": "./extension"
+    }
+  }
+}
