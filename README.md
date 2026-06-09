@@ -173,7 +173,9 @@ openclaw_with_jupyterlab_and_rstudio/
 │   └── jupyterlab-console-adopt/    #    Console 外部 Session 回显
 │
 ├── .gitignore
-├── MEMORY.md                        # 项目记忆与操作记录
+├── MEMORY.md                        # ⚠️ OpenClaw AI Agent 长期记忆样本
+│                                    #   告诉 AI 如何驱动这套环境的操作指南
+│                                    #   克隆后应替换为你自己的配置
 ├── openclaw.json                    # OpenClaw（工具 & MCP）配置
 └── README.md                        # ← 你在这里
 ```

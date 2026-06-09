@@ -1,5 +1,9 @@
 # MEMORY.md - 长期记忆
 
+> ⚠️ **此文件是 OpenClaw AI Agent 的长期记忆/操作指南**，不是给人看的项目文档。  
+> 它告诉 OpenClaw（AI 代理）如何驱动 JupyterLab + RStudio 这套数据分析环境。  
+> 克隆本仓库后，应将此文件内容替换为你自己的 OpenClaw MEMORY.md 配置。
+
 ## 工具使用
 
 ### 搜索引擎选择
