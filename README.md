@@ -172,6 +172,9 @@ openclaw_with_jupyterlab_and_rstudio/
 │   ├── jupyterlab-auto-reload/      #    Notebook 自动刷新（MCP 写入后 3s 刷新）
 │   └── jupyterlab-console-adopt/    #    Console 外部 Session 回显(.py源码模式)
 │
+├── example/                         # 端到端示例：墨尔本房价预测（22 步手机截图）
+│   └── README.md                    #    示例说明
+│
 ├── .gitignore
 ├── MEMORY.md                        # ⚠️ OpenClaw AI Agent 长期记忆样本
 │                                    #   告诉 AI 如何驱动这套环境的操作指南
@@ -398,6 +401,25 @@ jupyter labextension list
 5.  配置MEMORY.md：按自己的环境修改MEMORY.md
 6.  建议配置Claude Code，Claude可以接入国内LLM，适合配合OpenClaw使用
 7.  **开始分析：** 在 OpenClaw 对话中发号施令
+
+------------------------------------------------------------------------
+
+## 端到端示例
+
+> 墨尔本房价预测 —— 全程在手机微信中指挥 OpenClaw 完成，无需手动编写一行代码。
+
+**工作流：** RStudio 加载房价数据 → 观察/统计/作图 → 传 CSV 到 Jupyter Lab → 划分训练/测试集 → LightGBM 回归建模 → 预测 → 传回 RStudio → 作图对比真实值 vs 预测值
+
+共 22 步，每步含手机截图，详见 [`example/`](./example/README.md)。
+
+| 阶段 | 工具 | 步骤 |
+|----|----|----|
+| 数据探索与可视化 | RStudio (r-session) | 2-7 |
+| 导出数据到 Python | r-session.export_data → CSV | 8 |
+| 数据导入与探索 | Jupyter Lab (jupyter-mcp) | 9-10 |
+| 训练测试集划分 → LightGBM 建模 → 预测 | Jupyter Lab (jupyter-mcp) | 11-17 |
+| 导回预测结果到 R | jupyter-mcp.export_data → CSV | 18 |
+| 结果导入与对比作图 | RStudio (r-session) | 19-22 |
 
 ------------------------------------------------------------------------
 
