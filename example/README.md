@@ -17,7 +17,7 @@
 | `Melbourne_housing_FULL.csv` | Kaggle 原始数据集（约 35,000 行，含缺失值） |
 | `Melbourne_housing_Pre.py` | 数据预处理 Python 程序：缺失值填充、特征工程（房价对数变换、年份/类型编码等）、异常值筛选 |
 | `Melbourne_housing_pre.csv` | 预处理后的干净数据集（约 9,000 行，14 个特征） |
-| `Melbourne_housing_LGBM.py` | LightGBM 回归模型训练与超参数调优程序（含 Bayesian Optimization + Hyperopt） |
+| `Melbourne_housing_LGBM.py` | LightGBM 回归模型训练与调优程序（含 Bayesian Optimization + Hyperopt 完整调优流程） |
 | `demo-1.png` ~ `demo-22.png` | 全程手机微信指挥 OpenClaw 完成分析的 22 步截图 |
 
 ## 工作流
@@ -51,7 +51,7 @@ Melbourne_housing_LGBM.py         ← 模型训练与调优（558 行）
 
 ### LLM AI 部分（OpenClaw 指挥）
 
-上述传统 ML 代码就位后，在**手机上用微信指挥 OpenClaw** 完成整个数据分析流程：
+上述传统 ML 代码就位后，在**手机上用微信指挥 OpenClaw** 完成整个数据分析流程（注意：demo 中 LightGBM 使用默认参数简单拟合，超参数调优不在此范围内）：
 
 ```
 步骤 1-7:  RStudio 探索数据
@@ -67,7 +67,7 @@ Melbourne_housing_LGBM.py         ← 模型训练与调优（558 行）
 步骤 9-10: Jupyter Lab 导入数据
     OpenClaw → jupyter-mcp.import_data(...)
     OpenClaw → jupyter-mcp.run_code 执行 LightGBM 训练脚本
-            → 模型拟合、超参数调优、特征重要性分析
+            → 默认参数拟合模型
             → 用测试集预测
 
 步骤 18:  Python → CSV 导出
@@ -100,7 +100,7 @@ Melbourne_housing_LGBM.py         ← 模型训练与调优（558 行）
   │mcp  │   │ mcp   │
   │     │   │       │
   │EDA  │   │LightGBM│
-  │作图 │   │SHAP   │
+  │作图 │   │默认参数│
   └─────┘   └───────┘
 ```
 
@@ -115,7 +115,7 @@ Melbourne_housing_LGBM.py         ← 模型训练与调优（558 行）
 
 | AI 类型 | 作用 | 在本示例中 |
 |----|----|----|
-| **传统机器学习 AI** | 数据拟合、预测、优化 | LightGBM 回归模型、Bayesian 超参数调优、SHAP 特征分析 |
+| **传统机器学习 AI** | 数据拟合、预测、优化 | 数据预处理、LightGBM 回归模型、Bayesian 超参数调优、SHAP 特征分析 |
 | **大模型 AI (LLM)** | 理解自然语言、调度工具、编排流程 | OpenClaw 理解用户意图、调用 MCP 工具、管理跨语言数据流转 |
 
 > 传统 ML 提供**精确的数值预测能力**，大模型 AI 提供**灵活的理解与调度能力**。两者不是替代关系，而是互补关系。

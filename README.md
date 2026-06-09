@@ -482,21 +482,23 @@ jupyter labextension list
 **工作流：** 数据预处理 → RStudio 加载房价数据 → 观察/统计/作图 → 传 CSV 到 Jupyter Lab → LightGBM 回归建模 → 预测 → 传回 RStudio → 作图对比真实值 vs 预测值
 
 ```
-传统 ML 代码（预处理 + 模型调优）
-    │
+传统 ML 代码（预处理 + 模型训练与调优）
+    │  （超参数调优在本地脚本中完成，耗时复杂）
     ▼
 OpenClaw 大模型 AI 调度（22 步）
     ├── RStudio 端：数据探索、可视化
-    ├── Jupyter Lab 端：LightGBM 训练、预测
+    ├── Jupyter Lab 端：LightGBM 默认参数拟合、预测
     └── RStudio 端：结果对比作图
 ```
+
+> demo 中 OpenClaw 使用 LightGBM 默认参数简单拟合，超参数调优属于传统 ML 工程，不在 demo 范围内。
 
 | 阶段 | 工具 | 步骤 |
 |----|----|----|
 | RStudio EDA：加载/预览/统计/作图 | r-session | 1-7 |
 | R → CSV 导出 | r-session.export_data | 8 |
 | CSV → Python 导入 | jupyter-mcp.import_data | 9-10 |
-| LightGBM 建模 → 调优 → 预测 | jupyter-mcp.run_code | 11-17 |
+| LightGBM 默认参数拟合 → 预测 | jupyter-mcp.run_code | 11-17 |
 | Python → CSV 导出 | jupyter-mcp.export_data | 18 |
 | CSV → R 导入 → 对比作图 | r-session.import_data / run_code | 19-22 |
 
