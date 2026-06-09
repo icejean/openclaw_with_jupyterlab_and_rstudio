@@ -376,13 +376,30 @@ cd ..
 
 #### 直接使用预编译产物（免构建）
 
-如果不想构建，可以直接使用已包含的构建产物：
+如果不想构建，可以直接使用已包含的构建产物。两种方式：
+
+**方式一：jupyter 命令安装（推荐）**
 
 ``` bash
-# 全局安装（所有用户生效）
 jupyter labextension install jupyterlab-auto-reload
 jupyter labextension install jupyterlab-console-adopt
 ```
+
+**方式二：直接拷贝到 labextensions 目录**
+
+将 `jupyterlab_*/labextension/` 目录（注意末尾 `/`）拷贝到 Jupyter 的 labextensions 目录下：
+
+``` bash
+# 全局安装（例如 conda base 环境）
+cp -R jupyterlab-auto-reload/jupyterlab_auto_reload/labextension/  /usr/lib64/anaconda3/share/jupyter/labextensions/jupyterlab-auto-reload/
+cp -R jupyterlab-console-adopt/jupyterlab_console_adopt/labextension/  /usr/lib64/anaconda3/share/jupyter/labextensions/jupyterlab-console-adopt/
+
+# 用户局部安装（无需 sudo）
+cp -R jupyterlab-auto-reload/jupyterlab_auto_reload/labextension/  ~/.local/share/jupyter/labextensions/jupyterlab-auto-reload/
+cp -R jupyterlab-console-adopt/jupyterlab_console_adopt/labextension/  ~/.local/share/jupyter/labextensions/jupyterlab-console-adopt/
+```
+
+> 源路径末尾的 `/` 表示拷贝目录**内容**而非目录本身，目标路径需先创建对应目录名。
 
 #### 验证安装
 
