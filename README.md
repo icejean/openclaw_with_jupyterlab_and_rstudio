@@ -321,7 +321,7 @@ cd openclaw_with_jupyterlab_and_rstudio
 |---|---|
 | 🦞 小龙虾 OpenClaw 安全饲养教程 | [入门篇](https://zhuanlan.zhihu.com/p/2013144472117068259) |
 | 🦞 小龙虾 OpenClaw 安全饲养教程之二：本机部署 | [部署篇](https://zhuanlan.zhihu.com/p/2020880761520227367) |
-| 💬 OpenClaw 主流通讯渠道配置指南 | [Telegram / Discord / Signal 等](https://zhuanlan.zhihu.com/p/2041198920395658076) |
+| 💬 OpenClaw 主流通讯渠道配置指南 | [飞书 / 微信 / 钉钉](https://zhuanlan.zhihu.com/p/2041198920395658076) |
 | 🧪 JupyterHub + OpenClaw + Claude Code Vibe Coding | [Vibe Coding 实战](https://zhuanlan.zhihu.com/p/2026562226463482280) |
 | 📊 Jupyter Lab + OpenClaw AI 辅助数据分析 | [数据分析实战](https://zhuanlan.zhihu.com/p/2045196634368242170) |
 | 📈 RStudio + OpenClaw Vibe Coding & 数据分析 | [R 语言实战](https://zhuanlan.zhihu.com/p/2044067725241210044) |
