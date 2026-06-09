@@ -401,6 +401,122 @@ jupyter labextension list
 
 ------------------------------------------------------------------------
 
+## 依赖汇总
+
+| 组件 | 所需包 | 安装命令 |
+|----|----|----|
+| **jupyter-mcp** (MCP Server) | `mcp`, `jupyter-client` | `pip install mcp jupyter-client` |
+| **r-session-mcp** (MCP Server) | `mcp`, `httpx` | `pip install mcp httpx` |
+| **R API Server** (R 端) | `httpuv`, `jsonlite` | `install.packages(c("httpuv", "jsonlite"))` |
+| **数据交换** (R 端推荐) | `data.table` | `install.packages("data.table")` |
+| **数据交换** (Python 端) | `pandas` | `pip install pandas` |
+
+> `pip install` 在运行 MCP Server 的 Python 环境中执行（如 graphrag conda 环境），`install.packages` 在 R Console 中执行。
+
+------------------------------------------------------------------------
+
+## 环境变量参考
+
+### jupyter-mcp MCP Server
+
+| 变量 | 默认值 | 说明 |
+|----|----|----|
+| `JUPYTER_MCP_HOST` | `127.0.0.1` | MCP Server 监听地址（HTTP 模式用，stdio 模式无需监听） |
+| `JUPYTER_MCP_PORT` | `0` | MCP Server 端口，`0` = stdio 模式（推荐） |
+| `JUPYTER_MCP_TIMEOUT` | `120` | kernel 代码执行超时（秒） |
+| `JUPYTER_MCP_REGISTER` | `~/.jupyter-mcp/current` | kernel 注册文件路径 |
+
+### r-session MCP Server
+
+| 变量 | 默认值 | 说明 |
+|----|----|----|
+| `R_API_HOST` | `127.0.0.1` | R API 地址 |
+| `R_API_PORT` | `8161` | R API 端口 |
+| `R_API_TOKEN` | 空 | R API 认证 Token（空=不启用） |
+| `MCP_PORT` | `0` | MCP Server 端口，`0` = stdio 模式（推荐） |
+
+### R API Server（r-session-api.R）
+
+| 变量 / options | 默认值 | 说明 |
+|----|----|----|
+| `options(rsession_api_port = ...)` 或 `R_API_PORT` | `8161` | httpuv 监听端口 |
+| `options(rsession_api_host = ...)` | `127.0.0.1` | 监听地址 |
+| `options(rsession_api_max_rows = ...)` | `100` | 预览数据最大行数 |
+| `options(rsession_api_max_str = ...)` | `20` | `str()` 截断层级 |
+| `options(rsession_api_token = ...)` 或 `R_API_TOKEN` | 空 | Bearer Token（空=不启用认证） |
+
+> R options 优先级高于环境变量。所有配置可在 `source("r-session-api.R")` 前通过 `options()` 设置。
+
+### 共享目录
+
+| 变量 | 默认值 | 说明 |
+|----|----|----|
+| `R2PY_SHARED_DIR` | `~/.openclaw/workspace/r2py/` | R↔Python 共享目录（总入口） |
+| `R_SHARED_DIR` | 同 `R2PY_SHARED_DIR` | R 侧单独覆盖 |
+| `JUPYTER_SHARED_DIR` | 同 `R2PY_SHARED_DIR` | Python 侧单独覆盖 |
+
+------------------------------------------------------------------------
+
+## 常见问题
+
+### MCP Server 找不到 kernel
+
+确保已在 Jupyter cell 中运行过 `hook.register()`，且文件 `~/.jupyter-mcp/current` 存在。如果 kernel 重启过，需重新注册：
+
+``` python
+from jupyter_mcp import hook
+hook.register(force=True)
+```
+
+### R API 端口冲突
+
+启动时提示端口被占用，说明之前的 R API 进程未正常退出：
+
+``` r
+# 方式一：停止指定 server
+httpuv::stopServer(server)
+
+# 方式二：停止所有 httpuv server（不影响 Console 操作）
+httpuv::stopAllServers()
+
+# 然后重新启动
+source("r-session-ai/r-session-api.R")
+```
+
+### R session 执行 rm(list=ls()) 后 API 失效
+
+`rm(list=ls())` 会清空 `.GlobalEnv`，而 R API 的辅助函数（`safe_eval`、`ok`、`err`、`server` 等）也存储在全局环境中。清空后 API 处理器丢失，需重新加载：
+
+``` r
+source("r-session-ai/r-session-api.R")
+```
+
+建议将需要保留的对象放在独立环境中，或避免在开发过程中使用 `rm(list=ls())`。
+
+### 代理环境变量干扰
+
+系统配置了全局代理（如 Clash 的 `ALL_PROXY=socks5://...`），可能导致：
+
+- **r-session MCP Server** 启动时 `httpx.Client()` 初始化崩溃 —— MCP Server 已自动在启动时清理代理环境变量
+- **jupyter-mcp** NotebookClient 通过 REST API 写 .ipynb 时走代理 —— 已自动临时屏蔽 `http_proxy`/`https_proxy`
+
+如果手动调试遇到代理问题，可临时清除代理环境变量：
+
+``` bash
+unset ALL_PROXY HTTP_PROXY HTTPS_PROXY http_proxy https_proxy
+```
+
+### hook.register() 注册失败
+
+检查 Jupyter cell 中是否在正确的 kernel 中运行。如果连接文件找不到，可以手动检查：
+
+``` python
+from jupyter_mcp import hook
+hook.register(force=True)  # 加 force 参数覆盖已有的注册文件
+```
+
+------------------------------------------------------------------------
+
 ## License
 
 MIT
