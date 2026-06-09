@@ -3,26 +3,27 @@ output:
   html_document: default
   word_document: default
 ---
+
 # jupyter-mcp: 原理、架构与实现详解
 
-> 让 AI 代理像人一样在 Jupyter Lab 中做交互式数据分析
+> 让 AI 智能体像人一样在 Jupyter Lab 中做交互式数据分析
 
----
+------------------------------------------------------------------------
 
 ## 一、整体架构
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                   浏览器 (JupyterLab UI)                       │
+```         
+┌──────────────────────────────────────────────────────────────┐
+│                   浏览器 (JupyterLab UI)                     │
 │  ┌─────────────────────┐  ┌────────────────────────────────┐ │
 │  │ Notebook (.ipynb)   │  │ .py + Console                  │ │
 │  │ auto-reload 扩展    │  │ console-adopt 扩展             │ │
 │  └─────────┬───────────┘  └──────────┬─────────────────────┘ │
-└────────────┼──────────────────────────┼───────────────────────┘
-             │                          │
-             │  HTTP / WebSocket        │
-             ▼                          ▼
-┌─────────────────────────────────────────────────────────────┐
+└────────────┼─────────────────────────┼───────────────────────┘
+             │                         │
+             │  HTTP / WebSocket       │
+             ▼                         ▼
+┌──────────────────────────────────────────────────────────────┐
 │              Jupyter Server (JupyterHub)                     │
 │       /api/contents /api/kernels /api/sessions               │
 │       /api/kernels/{id}/channels (WebSocket)                 │
@@ -30,66 +31,66 @@ output:
              │                          │
              │   ZMQ (jupyter_client)   │  ZMQ (WebSocket proxy)
              ▼                          ▼
-┌─────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────┐
 │                    Jupyter Kernel                            │
 │                (IPython / graphrag)                          │
 │         Shell / IOPub / Stdin / Control / Heartbeat          │
-└────────────┬────────────────────────────────────────────────┘
+└────────────┬─────────────────────────────────────────────────┘
              │
              │ ZMQ (jupyter_client)
              ▼
-┌─────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────┐
 │              jupyter-mcp MCP Server (Python)                 │
 │                                                              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  JupyterKernel (ZMQ 连接管理)                         │   │
-│  │  - find_registered_kernel() → 自动发现并连接           │   │
-│  │  - connect(conn_file)  → BlockingKernelClient        │   │
-│  │  - execute(code)       → ZMQ Shell + IOPub           │   │
-│  │  - list_objects()      → 内省全局变量（JSON 协议）     │   │
-│  │  - preview_object()    → 预览变量详情                  │   │
-│  │  - get_loaded_packages()                              │   │
-│  └──────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────┐    │
+│  │  JupyterKernel (ZMQ 连接管理)                        │    │
+│  │  - find_registered_kernel() → 自动发现并连接         │    │
+│  │  - connect(conn_file)  → BlockingKernelClient        │    │
+│  │  - execute(code)       → ZMQ Shell + IOPub           │    │
+│  │  - list_objects()      → 内省全局变量（JSON 协议）   │    │
+│  │  - preview_object()    → 预览变量详情                │    │
+│  │  - get_loaded_packages()                             │    │
+│  └──────────────────────────────────────────────────────┘    │
 │                                                              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  MCP Protocol 层                                      │   │
-│  │  - mcp.types.Tool 定义（10 个工具）                    │   │
-│  │  - handle_call_tool 分发                              │   │
-│  │  - stdio / HTTP SSE 两种传输模式                       │   │
-│  └──────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────┐    │
+│  │  MCP Protocol 层                                     │    │
+│  │  - mcp.types.Tool 定义（10 个工具）                  │    │
+│  │  - handle_call_tool 分发                             │    │
+│  │  - stdio / HTTP SSE 两种传输模式                     │    │
+│  └──────────────────────────────────────────────────────┘    │
 │                                                              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  NotebookClient (Jupyter Server API 客户端)            │   │
-│  │  - 通过 REST API 操作 .ipynb cell                     │   │
-│  │  - add_code_cell() → PUT /api/contents                │   │
-│  │  - write_outputs()  → 写回执行结果到 Cell             │   │
-│  │  - zmq_outputs_to_cell_outputs() 格式转换             │   │
-│  │  - create checkpoint → 触发前端刷新                   │   │
-│  └──────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────┐    │
+│  │  NotebookClient (Jupyter Server API 客户端)          │    │
+│  │  - 通过 REST API 操作 .ipynb cell                    │    │
+│  │  - add_code_cell() → PUT /api/contents               │    │
+│  │  - write_outputs()  → 写回执行结果到 Cell            │    │
+│  │  - zmq_outputs_to_cell_outputs() 格式转换            │    │
+│  │  - create checkpoint → 触发前端刷新                  │    │
+│  └──────────────────────────────────────────────────────┘    │
 │                                                              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  shared_dir (R ↔ Python 数据交换)                     │   │
-│  │  - SHARED_DIR 默认 ~/workspace/r2py/                 │   │
-│  │  - export_data/import_data 通过 CSV 交换              │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+│  ┌──────────────────────────────────────────────────────┐    │
+│  │  shared_dir (R ↔ Python 数据交换)                    │    │
+│  │  - SHARED_DIR 默认 ~/workspace/r2py/                 │    │
+│  │  - export_data/import_data 通过 CSV 交换             │    │
+│  └──────────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────────┘
              │
              │ MCP Protocol (stdio / SSE)
              ▼
 ┌─────────────────────────────────────────────────────────────┐
 │              OpenClaw Gateway                               │
-│                                                              │
+│                                                             │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │  MCP Runtime Manager                                │   │
-│  │  - 进程生命周期管理 (spawn/kill/restart)            │   │
-│  │  - 工具发现 (listTools)                             │   │
-│  │  - 工具调用 (callTool)                              │   │
+│  │  MCP Runtime Manager                                 │   │
+│  │  - 进程生命周期管理 (spawn/kill/restart)             │   │
+│  │  - 工具发现 (listTools)                              │   │
+│  │  - 工具调用 (callTool)                               │   │
 │  └──────────────────────────────────────────────────────┘   │
-│                                                              │
+│                                                             │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │  Tool Router                                          │   │
-│  │  jupyter-mcp__run_code → MCP → kernel                 │   │
-│  │  jupyter-mcp__health_check → MCP → kernel             │   │
+│  │  Tool Router                                         │   │
+│  │  jupyter-mcp__run_code → MCP → kernel                │   │
+│  │  jupyter-mcp__health_check → MCP → kernel            │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
              │
@@ -97,7 +98,7 @@ output:
          AI 模型（DeepSeek / GLM / Kimi ...）
 ```
 
----
+------------------------------------------------------------------------
 
 ## 二、核心组件详解
 
@@ -107,7 +108,7 @@ output:
 
 **运行方式：** 在 Notebook cell 或 .py Console 中执行：
 
-```python
+``` python
 from jupyter_mcp import hook
 hook.register()           # 首次注册
 hook.register(force=True) # 覆盖已有注册
@@ -115,7 +116,7 @@ hook.register(force=True) # 覆盖已有注册
 
 **工作原理：**
 
-```
+```         
 register() 被调用时：
   1. 检查是否在 IPython kernel 环境中（get_ipython()）
   2. 查找当前 kernel 的连接文件（~/.local/share/jupyter/runtime/kernel-*.json）
@@ -134,9 +135,9 @@ register() 被调用时：
      - 包含 jupyter_server 字段（REST API 调用用）
 ```
 
-**注册文件结构 (~/.jupyter-mcp/current)：**
+**注册文件结构 (\~/.jupyter-mcp/current)：**
 
-```json
+``` json
 {
   "kernel_conn_file": "/home/openclaw/.local/share/.../kernel-xxx.json",
   "kernel_name": "graphrag",
@@ -176,7 +177,7 @@ register() 被调用时：
 
 **shebang 与实际运行环境：**
 
-```python
+``` python
 #!/usr/lib64/anaconda3/envs/graphrag/bin/python3
 ```
 
@@ -186,19 +187,19 @@ MCP Server 运行在 `graphrag` conda 环境中。虽然服务器是这个 Pytho
 
 **环境变量：**
 
-| 变量 | 默认值 | 说明 |
-|---|---|---|
-| `JUPYTER_MCP_HOST` | `127.0.0.1` | MCP 服务器监听地址 |
-| `JUPYTER_MCP_PORT` | `0` | 端口号，`0`=stdio 模式 |
-| `JUPYTER_MCP_TIMEOUT` | `120` | kernel 代码执行超时秒数 |
-| `JUPYTER_MCP_REGISTER` | `~/.jupyter-mcp/current` | 注册文件路径 |
-| `R2PY_SHARED_DIR` | `~/workspace/r2py/` | R↔Python 数据交换目录 |
-| `JUPYTER_SHARED_DIR` | 同 `R2PY_SHARED_DIR` | jupyter 侧覆盖 |
+| 变量                   | 默认值                   | 说明                    |
+|------------------------|--------------------------|-------------------------|
+| `JUPYTER_MCP_HOST`     | `127.0.0.1`              | MCP 服务器监听地址      |
+| `JUPYTER_MCP_PORT`     | `0`                      | 端口号，`0`=stdio 模式  |
+| `JUPYTER_MCP_TIMEOUT`  | `120`                    | kernel 代码执行超时秒数 |
+| `JUPYTER_MCP_REGISTER` | `~/.jupyter-mcp/current` | 注册文件路径            |
+| `R2PY_SHARED_DIR`      | `~/workspace/r2py/`      | R↔Python 数据交换目录   |
+| `JUPYTER_SHARED_DIR`   | 同 `R2PY_SHARED_DIR`     | jupyter 侧覆盖          |
 
 **ZMQ 通道：**
 
 | 通道 | 用途 | socket 类型 |
-|---|---|---|
+|----|----|----|
 | Shell | 发送 execute_request，接收 execute_reply | DEALER → ROUTER |
 | IOPub | 接收 execute_input/result/stream/error 等广播消息 | SUB |
 | Stdin | 接收 input() 请求 | DEALER → ROUTER |
@@ -207,7 +208,7 @@ MCP Server 运行在 `graphrag` conda 环境中。虽然服务器是这个 Pytho
 
 **自动发现与连接：**
 
-```python
+``` python
 find_registered_kernel():
   1. 读取 ~/.jupyter-mcp/current
   2. 获取 kernel_conn_file 路径
@@ -219,7 +220,7 @@ find_registered_kernel():
 
 **代码执行流程：**
 
-```
+```         
 execute(code):
   1. kc.execute(code)  → 发送 execute_request 到 Shell 通道
      - msg_id = UUID (用于后续匹配响应)
@@ -241,7 +242,7 @@ execute(code):
 
 所有内省操作（list_objects、preview_object、get_loaded_packages）均通过在 **kernel 中执行 Python 代码** 实现，而非通过 Jupyter 协议的原生 inspect 请求。
 
-```python
+``` python
 # list_objects 示例：在 kernel 中执行内省代码
 code = """
 import sys, types, builtins, json
@@ -265,23 +266,20 @@ result = kernel.execute(code)
 
 MCP Server 与 kernel 之间的结构化数据交换采用**标记协议**：
 
-1. MCP Server 发送一段内省代码给 kernel 执行
-2. 内省代码收集信息后，打印 `__JUPYTER_MCP_JSON__` 标记行
-3. 在标记行之后打印 JSON 序列化的结果
-4. MCP Server 从 stdout 中解析标记行之后的 JSON
+1.  MCP Server 发送一段内省代码给 kernel 执行
+2.  内省代码收集信息后，打印 `__JUPYTER_MCP_JSON__` 标记行
+3.  在标记行之后打印 JSON 序列化的结果
+4.  MCP Server 从 stdout 中解析标记行之后的 JSON
 
-这样做的好处：
-- 不依赖 Jupyter 协议扩展（保持兼容性）
-- JSON 数据与普通 stdout 输出可以共存
-- kernel 内省代码完全可控可扩展
+这样做的好处： - 不依赖 Jupyter 协议扩展（保持兼容性） - JSON 数据与普通 stdout 输出可以共存 - kernel 内省代码完全可控可扩展
 
----
+------------------------------------------------------------------------
 
 ### 2.3 NotebookClient — Notebook 操作模块
 
 **作用：** 通过 Jupyter Server REST API 操作 .ipynb 文件（插入 Cell、写回结果、创建检查点）。
 
-```python
+``` python
 class NotebookClient:
     def __init__(self, server_info, notebook_path):
         # 存储 server URL + token
@@ -316,7 +314,7 @@ class NotebookClient:
 
 **NotebookClient 创建流程：**
 
-```
+```         
 get_notebook_client():
   1. 从 ~/.jupyter-mcp/current 获取 jupyter_server 信息
   2. 从连接文件名提取 kernel ID
@@ -328,14 +326,14 @@ get_notebook_client():
 
 所有 REST API 调用通过 `urllib.request`（而非 `httpx`/`requests`），并在调用前后**临时屏蔽 `http_proxy`/`https_proxy` 环境变量**。这是因为服务器可能配置了全局代理（如 Clash），而 Jupyter Server 在本地 127.0.0.1 上运行，不需要经过代理。
 
----
+------------------------------------------------------------------------
 
 ## 三、MCP 工具清单
 
 ### 3.1 通用工具（两种模式共用）
 
 | 工具 | 输入 | 输出 | 说明 |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | `run_code` | `code: string` | stdout + 结果 | 执行 Python 代码，可修改 session 变量 |
 | `list_objects` | 无 | 变量列表（类型/大小/形状/列类型） | 使用 `__JUPYTER_MCP_JSON__` 标记协议 |
 | `preview_data` | `name: string` | DataFrame/Series/数组详情 | shape/dtypes/head/describe/缺失值 |
@@ -346,15 +344,15 @@ get_notebook_client():
 
 ### 3.2 .py + Console 模式专用
 
-| 工具 | 输入 | 说明 |
-|---|---|---|
-| `read_source` | 无 | 读取当前 .py 源码文件 |
-| `write_source` | `code: string` | 覆盖写入 .py 源码文件 |
+| 工具            | 输入           | 说明                        |
+|-----------------|----------------|-----------------------------|
+| `read_source`   | 无             | 读取当前 .py 源码文件       |
+| `write_source`  | `code: string` | 覆盖写入 .py 源码文件       |
 | `append_source` | `code: string` | 追加代码到 .py 源码文件末尾 |
 
 ### 3.3 模式自适配逻辑（run_code）
 
-```
+```         
 run_code(code):
   if mode == "notebook":
     # 1. 通过 Jupyter Server REST API 插入 Cell（含计算 execution_count）
@@ -374,13 +372,13 @@ run_code(code):
 ### 3.4 R ↔ Python 数据交换工具
 
 | 工具 | 内部实现 |
-|---|---|
+|------------------------------------|------------------------------------|
 | `export_data(name)` | kernel 中执行 `obj.to_csv(path, index=False)` + 打印 shape |
 | `import_data(path, var_name)` | kernel 中执行 `pd.read_csv(path)` + 打印 shape |
 
 **共享目录：** `SHARED_DIR` 默认 `~/.openclaw/workspace/r2py/`，文件名使用 UUID 前缀。
 
----
+------------------------------------------------------------------------
 
 ## 四、JupyterLab 扩展
 
@@ -390,7 +388,7 @@ run_code(code):
 
 **原理：**
 
-```typescript
+``` typescript
 setInterval(async () => {
   const current = tracker.currentWidget;
   if (!current) return;
@@ -415,14 +413,11 @@ setInterval(async () => {
 }, 3000);
 ```
 
-**关键点：**
-- 使用 JupyterLab 的 `serviceManager.contents` API
-- 有 dirty 保护：用户有未保存修改时跳过
-- 不拦截用户操作，仅监控 `last_modified` 时间戳
-- 通过 MCP 的 checkpoint 创建触发的 `201` 响应可确保 `last_modified` 被更新
+**关键点：** - 使用 JupyterLab 的 `serviceManager.contents` API - 有 dirty 保护：用户有未保存修改时跳过 - 不拦截用户操作，仅监控 `last_modified` 时间戳 - 通过 MCP 的 checkpoint 创建触发的 `201` 响应可确保 `last_modified` 被更新
 
-**安装路径：** 
-```
+**安装路径：**
+
+```         
 JupyterHub → base conda环境
 /usr/lib64/anaconda3/share/jupyter/labextensions/
 ```
@@ -441,7 +436,7 @@ MCP Server 通过 ZMQ（jupyter_client）直接连接 kernel，使用不同的 S
 
 扩展监听 kernel 的 `iopubMessage` 信号——这个信号包含**所有 Session** 发出的 IOPub 消息（不经过 msg_id 过滤）。
 
-```typescript
+``` typescript
 kernel.iopubMessage.connect(onIOPubMessage);
 
 function onIOPubMessage(_, msg) {
@@ -482,18 +477,18 @@ function onIOPubMessage(_, msg) {
 **难点解决：**
 
 | 问题 | 解决方案 |
-|---|---|
+|------------------------------------|------------------------------------|
 | Console 只显示自身 Session 消息 | 使用 `kernel.iopubMessage`（原始信号）替代 future 的过滤信号 |
 | 需要创建 Console Cell 但不想重复执行代码 | 不调用 `kernel.requestExecute()`，用伪 future 捕获已有的 IOPub 消息 |
 | OutputArea 需要 future 对象才能渲染 | 创建伪 future，等 OutputArea 设置 `onIOPub` 回调后转发消息 |
 | 执行序号 `[n]` 为空 | 从 execute_input 消息的 execution_count 字段获取并设置 |
 
----
+------------------------------------------------------------------------
 
 ## 五、通信协议对比
 
 | 特征 | ZMQ（MCP 直连） | WebSocket（Jupyter 前端） | REST API（NotebookClient） |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | 连接方式 | jupyter_client (Python) | 浏览器 WebSocket API | urllib HTTP |
 | Session ID | 随机生成 | 随机生成（不同） | 不适用 |
 | 协议 | Jupyter Kernel Protocol 5.x | 同 ZMQ，经 HTTP 封装 | Jupyter Contents API |
@@ -502,20 +497,20 @@ function onIOPubMessage(_, msg) {
 | 持久性 | 断开需重连 | 通常长连接 | 无状态 |
 | 用途 | 代码执行 + 内省 | 用户交互 | cell 读写 |
 
----
+------------------------------------------------------------------------
 
 ## 六、启动与部署流程
 
 ### 前提条件
 
-```bash
+``` bash
 # graphrag conda 环境中安装依赖
 pip install mcp httpx jupyter-client
 ```
 
 ### 完整启动流程
 
-```mermaid
+``` mermaid
 sequenceDiagram
     participant User as 用户
     participant JL as JupyterLab
@@ -543,7 +538,7 @@ sequenceDiagram
 
 ### OpenClaw 配置
 
-```json
+``` json
 {
   "mcp": {
     "servers": {
@@ -562,7 +557,7 @@ sequenceDiagram
 
 除了默认的 stdio 模式，MCP Server 还支持 HTTP/SSE 模式：
 
-```bash
+``` bash
 export JUPYTER_MCP_PORT=8765
 python3 jupyter-mcp-server.py
 # 启动在 http://127.0.0.1:8765/sse
@@ -570,19 +565,19 @@ python3 jupyter-mcp-server.py
 
 HTTP 模式依赖 `uvicorn` 和 `starlette`，适用于远程连接场景。
 
----
+------------------------------------------------------------------------
 
 ## 七、R ↔ Python 数据交换详解
 
 ### 设计理念
 
-- 跨 session 传的**只限小数据集**，大数据集在该 session 原地处理
-- **只用 CSV** — R 和 Python 都原生支持，方案最简单通用
-- CSV 类型可能失真，但小数据集一两个 `astype()` 就修好了
+-   跨 session 传的**只限小数据集**，大数据集在该 session 原地处理
+-   **只用 CSV** — R 和 Python 都原生支持，方案最简单通用
+-   CSV 类型可能失真，但小数据集一两个 `astype()` 就修好了
 
 ### 架构
 
-```
+```         
 R Session → R API (httpuv) → r-session-mcp (Python) → CSV
                                                          ↓
 Jupyter Kernel ← jupyter-mcp (Python) ← CSV
@@ -592,30 +587,30 @@ Jupyter Kernel ← jupyter-mcp (Python) ← CSV
 
 **Python → R（`data.table::fread`）：** 所有类型无损 ✅
 
-| Python | R | CSV 中间格式 |
-|---|---|---|
-| int64 | integer | `1` |
-| float64 | numeric | `10.5` |
-| object (str) | character | `Alice` |
-| bool | logical | `True` / `False` |
-| datetime64 (日期) | IDate/Date | `2026-06-07` |
-| datetime64 (时间) | POSIXct | `2026-06-07 10:30:00` |
+| Python            | R          | CSV 中间格式          |
+|-------------------|------------|-----------------------|
+| int64             | integer    | `1`                   |
+| float64           | numeric    | `10.5`                |
+| object (str)      | character  | `Alice`               |
+| bool              | logical    | `True` / `False`      |
+| datetime64 (日期) | IDate/Date | `2026-06-07`          |
+| datetime64 (时间) | POSIXct    | `2026-06-07 10:30:00` |
 
 **R → Python（`pd.read_csv`）：** 日期/时间丢字符串 ❌（需 `pd.to_datetime()` 修复）
 
 ### 共享目录
 
-```
+```         
 默认: ~/.openclaw/workspace/r2py/（各用户工作区下，天然隔离）
 覆盖: R2PY_SHARED_DIR 或 JUPYTER_SHARED_DIR 环境变量
 文件名: UUID 前缀 + .csv
 ```
 
----
+------------------------------------------------------------------------
 
 ## 八、项目文件清单
 
-```
+```         
 jupyter_mcp/
 ├── __init__.py              # 包初始化
 ├── hook.py                  # kernel 注册函数（在 JupyterLab cell 中运行）
@@ -623,9 +618,7 @@ jupyter_mcp/
 ├── setup.py                 # 可编辑安装配置（pip install -e .）
 ├── README.md                # 快速入门文档
 ├── jupyter-mcp-architecture.md  # 本文档
-├── jupyter-mcp-architecture.html  # HTML 渲染版
-├── jupyter-mcp-architecture.docx  # Word 文档版
-├── auto_reload.js           # auto-reload 扩展独立 JS 版本（注入式）
+└── auto_reload.js           # auto-reload 扩展独立 JS 版本（注入式）
 
 jupyterlab-auto-reload/      # Notebook 自动刷新扩展（工程构建版）
 ├── package.json
@@ -642,24 +635,24 @@ jupyterlab-console-adopt/    # Console 外部 Session 捕获扩展
 └── tsconfig.json
 ```
 
----
+------------------------------------------------------------------------
 
 ## 九、已知限制与注意事项
 
-1. **JupyterLab 版本差异**：JupyterHub-singleuser 可能跑在 base conda 环境（4.3.x），扩展需装到对应环境的 `labextensions` 路径
-2. **Console Session 隔离**：Console 不显示外部 Session 的执行结果是 JupyterLab 的设计限制，`console-adopt` 扩展通过监听原始 IOPub 信号绕过
-3. **绘图输出**：matplotlib 图表通过 `display_data` 消息传递 base64 PNG，在 Console 中以图片方式渲染
-4. **内核切换**：切换 kernel 需重新运行 `hook.register(force=True)`
-5. **只能连接一个 kernel**：注册文件 `~/.jupyter-mcp/current` 是单文件，后注册的会覆盖之前的
-6. **代理干扰**：Jupyter Server 在本地运行，REST API 调用需临时屏蔽 `http_proxy` 环境变量
-7. **连接文件重建**：kernel 重启后原始连接文件可能被清理，MCP Server 会从注册文件中的 `connection` 字段重建临时连接文件
+1.  **JupyterLab 版本差异**：JupyterHub-singleuser 可能跑在 base conda 环境（4.x），扩展需装到对应环境的 `labextensions` 路径
+2.  **Console Session 隔离**：Console 不显示外部 Session 的执行结果是 JupyterLab 的设计限制，`console-adopt` 扩展通过监听原始 IOPub 信号绕过
+3.  **绘图输出**：matplotlib 图表通过 `display_data` 消息传递 base64 PNG，在 Console 中以图片方式渲染
+4.  **内核切换**：切换 kernel 需重新运行 `hook.register(force=True)`
+5.  **只能连接一个 kernel**：注册文件 `~/.jupyter-mcp/current` 是单文件，后注册的会覆盖之前的
+6.  **代理干扰**：Jupyter Server 在本地运行，REST API 调用需临时屏蔽 `http_proxy` 环境变量
+7.  **连接文件重建**：kernel 重启后原始连接文件可能被清理，MCP Server 会从注册文件中的 `connection` 字段重建临时连接文件
 
----
+------------------------------------------------------------------------
 
 ## 十、变更日志
 
 | 日期 | 变更内容 |
-|---|---|
+|------------------------------------|------------------------------------|
 | 初始版 | 基础架构、ZMQ 连接、kernel 注册、run_code/list_objects/preview_data |
 | v2 | 新增 NotebookClient（REST API 操作 cell）、auto-reload 扩展 |
 | v3 | 新增 console-adopt 扩展（外部 Session 显示） |
