@@ -4,7 +4,7 @@
 
 一体化的 **Python + R** 数据分析工作台，以 **OpenClaw AI Agent** 为大脑，串联 **JupyterLab (Python)** 和 **RStudio (R)** 两个交互式分析引擎，通过 **MCP 协议**统一工具接口，实现跨语言数据流无缝流转。
 
----
+------------------------------------------------------------------------
 
 ## 为什么做这个
 
@@ -12,59 +12,59 @@ Python 和 R 各有不可替代的生态。传统方案（如 Posit/Quarto）侧
 
 ### 核心优势
 
-- 🏠 **数据不出服务器不出境**，内网可配合一体机部署
-- 🇨🇳 **国内信创环境已验证**：麒麟 V10 + 鲲鹏 CPU (ARM64) + 国产满血版 LLM
-- 🔄 **LLM 可按需切换**（DeepSeek / GLM / MiniMax / Kimi 等）
-- 🪶 轻量级浏览器界面，易用易部署易维护
-- 🔓 完全开源免费
-- 📊 AI 贯穿 **编码阶段** + **数据分析阶段**
+-   🏠 **数据不出服务器不出境**，内网可配合一体机部署
+-   🇨🇳 **国内信创环境已验证**：麒麟 V10 + 鲲鹏 CPU (ARM64) + 国产满血版 LLM
+-   🔄 **LLM 可按需切换**（DeepSeek / GLM / MiniMax / Kimi 等）
+-   🪶 轻量级浏览器界面，易用易部署易维护
+-   🔓 完全开源免费
+-   📊 AI 贯穿 **编码阶段** + **数据分析阶段**
 
----
+------------------------------------------------------------------------
 
 ## 架构
 
 ### 整体架构图
 
-```
+```         
                           ┌──────────────────────┐
-                          │  用户（浏览器界面）    │
-                          │ JupyterLab / RStudio   │
+                          │  用户（浏览器界面）  │
+                          │ JupyterLab / RStudio │
                           └──────────┬───────────┘
                                      │
                           ┌──────────▼───────────┐
-                          │    OpenClaw Agent     │  ← AI 大脑
-                          │  对话 + 指令路由 + MCP │  ← 所有工具通过 MCP 协议暴露
+                          │    OpenClaw Agent    │  ← AI 大脑
+                          │对话 + 指令路由 + MCP │  ← 所有工具通过 MCP 协议暴露
                           └──┬───────────────┬───┘
                              │               │
-              ┌──────────────▼──┐    ┌──────▼──────────────┐
-              │  MCP Server     │    │  MCP Server         │
-              │  jupyter-mcp    │    │  r-session           │
-              │  (Python)       │    │  (Python)            │
-              │  ZMQ 直连 kernel │    │  HTTP 调用 R API     │
-              └──────┬─────────┘    └──────┬───────────────┘
+              ┌──────────────▼──┐    ┌───────▼─────────────┐
+              │ MCP Server      │    │  MCP Server         │
+              │ jupyter-mcp     │    │  r-session          │
+              │ (Python)        │    │  (Python)           │
+              │ ZMQ 直连 kernel │    │  HTTP 调用 R API    │
+              └──────┬──────────┘    └──────┬──────────────┘
                      │                      │
-              ┌──────▼─────────┐    ┌──────▼───────────────┐
-              │  Jupyter       │    │  R API (httpuv)       │
-              │  Kernel        │    │  同进程非阻塞 HTTP     │
-              │  (IPython)     │    │  → eval() 操作         │
-              │  Python 对象    │    │  .GlobalEnv           │
-              └──────┬─────────┘    │  RStudio R Session    │
+              ┌──────▼─────────┐    ┌───────▼──────────────┐
+              │  Jupyter       │    │  R API (httpuv)      │
+              │  Kernel        │    │  同进程非阻塞 HTTP   │
+              │  (IPython)     │    │  → eval() 操作       │
+              │  Python 对象   │    │  .GlobalEnv          │
+              └──────┬─────────┘    │  RStudio R Session   │
                      │              └──────┬───────────────┘
                      │                     │
                      └──────────┬──────────┘
                                 │
-                     ┌──────────▼──────────┐
-                     │  r2py 共享目录        │
-                     │  (~/r2py/*.csv)      │
+                     ┌──────────▼─────────────┐
+                     │  r2py 共享目录         │
+                     │  (~/r2py/*.csv)        │
                      │  R ↔ Python 跨语言同步 │
-                     └─────────────────────┘
+                     └────────────────────────┘
 ```
 
 ### 两条数据流详解
 
 #### ① Python 侧（jupyter-mcp）
 
-```
+```         
 OpenClaw Agent
     │ callTool(run_code, ...) ← MCP 协议
     ▼
@@ -81,7 +81,7 @@ r2py/ 共享目录  (CSV 文件)
 
 **通信协议：** `jupyter_client` + ZMQ（Shell / IOPub / Stdin / Control / Heartbeat 五个通道）
 
-```
+```         
 MCP Server                              Jupyter Kernel
     │    execute_request (Shell)              │
     ├────────────────────────────────────────>│
@@ -98,7 +98,7 @@ MCP Server                              Jupyter Kernel
 
 #### ② R 侧（r-session）
 
-```
+```         
 OpenClaw Agent
     │ callTool(run_code, ...) ← MCP 协议
     ▼
@@ -115,11 +115,11 @@ r2py/ 共享目录  (CSV 文件)
 
 **通信协议：** HTTP（`httpx.Client` → `httpuv::startServer`）
 
-```
+```         
 MCP Server                              R API (httpuv)
-    │  GET /health                           │
-    │  GET /env                              │
-    │  POST /eval  {code: "..."}             │
+    │  GET /health                            │
+    │  GET /env                               │
+    │  POST /eval  {code: "..."}              │
     ├────────────────────────────────────────>│
     │  {success, output, new_objs, ...}       │
     │<────────────────────────────────────────┤
@@ -133,10 +133,10 @@ MCP Server                              R API (httpuv)
 
 #### ③ 跨语言数据交换（r2py）
 
-```
+```         
 R Session                          Jupyter Kernel
     │                                    │
-    │  export_data("df")                  │
+    │  export_data("df")                 │
     │  fwrite(df, "r2py/xxx.csv")        │
     └───────── CSV 文件 ────────────────>│  pd.read_csv("r2py/xxx.csv")
     │                                    │
@@ -148,11 +148,11 @@ R Session                          Jupyter Kernel
 
 > 详细说明见下方「数据交换」章节。
 
----
+------------------------------------------------------------------------
 
 ## 项目结构
 
-```
+```         
 openclaw_with_jupyterlab_and_rstudio/
 │
 ├── jupyter_mcp/                     # Python 侧：Jupyter MCP Server
@@ -168,9 +168,9 @@ openclaw_with_jupyterlab_and_rstudio/
 │   ├── r-session-architecture.md    #    架构设计文档（本文核心参考）
 │   └── README.md                    #    快速入门
 │
-├── labextensions/                   # JupyterLab 自定义扩展
+├── labextensions/                   # JupyterLab 4.x 自定义扩展（编译后）
 │   ├── jupyterlab-auto-reload/      #    Notebook 自动刷新（MCP 写入后 3s 刷新）
-│   └── jupyterlab-console-adopt/    #    Console 外部 Session 回显
+│   └── jupyterlab-console-adopt/    #    Console 外部 Session 回显(.py源码模式)
 │
 ├── .gitignore
 ├── MEMORY.md                        # ⚠️ OpenClaw AI Agent 长期记忆样本
@@ -183,14 +183,14 @@ openclaw_with_jupyterlab_and_rstudio/
 └── README.md                        # ← 你在这里
 ```
 
----
+------------------------------------------------------------------------
 
 ## 组件详解
 
 ### 组件对照表
 
 | 组件 | 语言 | 运行位置 | 通信方式 | 连接目标 | 操作对象 |
-|---|---|---|---|---|---|
+|------------|------------|------------|------------|------------|------------|
 | **jupyter-mcp** | Python | graphrag conda | ZMQ (jupyter_client) | Jupyter Kernel | kernel 命名空间中的 Python 对象 |
 | **r-session** | Python | graphrag conda | HTTP (httpx) → httpuv | R API → RStudio R Session | .GlobalEnv 中的 R 对象 |
 | **R API** | R | RStudio 同进程 | httpuv (非阻塞 HTTP) | 当前 R Session | eval() → 直接操作环境 |
@@ -202,45 +202,45 @@ openclaw_with_jupyterlab_and_rstudio/
 #### Python 侧（jupyter-mcp）
 
 | 特性 | 说明 |
-|---|---|
+|------------------------------------|------------------------------------|
 | 显示位置 | Notebook Cell / Console 窗口（由 hook 自动检测） |
 | 代码执行 | 通过 ZMQ 发送到 kernel 执行 |
 | 内省方式 | 在 kernel 中执行内省代码 + `__JUPYTER_MCP_JSON__` 标记协议 |
-| 文件操作 | Notebook 模式：通过 REST API 写 .ipynb；Console 模式：不写 .py 文件 |
+| 文件操作 | Notebook 模式：通过 REST API 写 .ipynb；Console 模式：不写 .py 源码文件 |
 | 扩展依赖 | `jupyter-client`, `mcp`, `urllib`（Notebook 模式） |
 | 启动方式 | 在 JupyterLab 中运行 `hook.register()` 后自动连接 |
 
 #### R 侧（r-session）
 
-| 特性 | 说明 |
-|---|---|
-| 显示位置 | RStudio Console + Environment 面板 + Plots 面板 |
-| 代码执行 | eval(parse(text=code)) 在 .GlobalEnv 中执行 |
-| Console 回显 | sink(split=TRUE) 实时回显到 Console |
-| 安全认证 | Bearer Token（可选），多用户场景必须配置 |
-| 依赖 | httpuv（R 端）、httpx + mcp（Python 端） |
-| 启动方式 | 在 RStudio Console 中运行 `source("r-session-api.R")` |
+| 特性         | 说明                                                  |
+|--------------|-------------------------------------------------------|
+| 显示位置     | RStudio Console + Environment 面板 + Plots 面板       |
+| 代码执行     | eval(parse(text=code)) 在 .GlobalEnv 中执行           |
+| Console 回显 | sink(split=TRUE) 实时回显到 Console                   |
+| 安全认证     | Bearer Token（可选），多用户场景必须配置              |
+| 依赖         | httpuv（R 端）、httpx + mcp（Python 端）              |
+| 启动方式     | 在 RStudio Console 中运行 `source("r-session-api.R")` |
 
----
+------------------------------------------------------------------------
 
 ## 数据交换（R ↔ Python）
 
 ### 架构
 
-```
+```         
 R Session                    CSV 文件                    Jupyter Kernel
     │                           │                            │
     │  fwrite(df, path) ───────>│                            │
     │                           │  pd.read_csv(path) ───────>│
     │                           │                            │
-    │  <─────── pd.read_csv()  │                            │
-    │  fread(path) ────────────│<─────── to_csv(path)       │
+    │  <─────── pd.read_csv()   │                            │
+    │  fread(path) ─────────────│<─────── to_csv(path)       │
 ```
 
 ### 工具
 
 | 方向 | MCP 工具 | 内部实现 |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | R → Python | r-session.export_data → jupyter-mcp.import_data | `data.table::fwrite` → CSV → `pd.read_csv` |
 | Python → R | jupyter-mcp.export_data → r-session.import_data | `pd.to_csv` → CSV → `data.table::fread` |
 
@@ -248,24 +248,24 @@ R Session                    CSV 文件                    Jupyter Kernel
 
 **Python → R（无损 ✅）：**
 
-| Python | R | CSV 中间格式 |
-|---|---|---|
-| int64 | integer | `1` |
-| float64 | numeric | `10.5` |
-| object (str) | character | `Alice` |
-| bool | logical | `TRUE` |
-| datetime64 | IDate / POSIXct | `2026-06-07` |
+| Python       | R               | CSV 中间格式 |
+|--------------|-----------------|--------------|
+| int64        | integer         | `1`          |
+| float64      | numeric         | `10.5`       |
+| object (str) | character       | `Alice`      |
+| bool         | logical         | `TRUE`       |
+| datetime64   | IDate / POSIXct | `2026-06-07` |
 
 **R → Python（日期/时间需修复 ⚠️）：**
 
 | R | CSV | Python | 修复 |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | integer/num/char/logical | 原生格式 | int64/float64/object/bool ✅ | 无需修复 |
 | IDate / POSIXct | `2026-06-07` | object（字符串）❌ | `pd.to_datetime(df['col'])` |
 
 ### 共享目录
 
-```
+```         
 默认:  ~/.openclaw/workspace/r2py/  （各用户工作区下，天然隔离）
 覆盖:  R2PY_SHARED_DIR 环境变量
        R_SHARED_DIR（R 侧单独覆盖）
@@ -273,35 +273,35 @@ R Session                    CSV 文件                    Jupyter Kernel
 文件名: UUID 前缀 + .csv
 ```
 
----
+------------------------------------------------------------------------
 
 ## 场景示例
 
-| 场景 | Python (jupyter-mcp) | R (r-session) |
-|---|---|---|
-| 数据清洗、ETL | ✅ pandas | |
-| 统计分析、回归建模 | | ✅ lm, glm |
-| 可视化（交互式） | ✅ plotly | ✅ ggplot2 |
-| 可视化（出版级） | | ✅ ggplot2 |
-| 机器学习（传统） | ✅ sklearn | |
-| 深度学习 | ✅ PyTorch / TensorFlow | |
-| 时间序列分析 | | ✅ forecast |
-| 报表生成 | ✅ nbconvert | ✅ rmarkdown |
+| 场景               | Python (jupyter-mcp)    | R (r-session) |
+|--------------------|-------------------------|---------------|
+| 数据清洗、ETL      | ✅ pandas               |               |
+| 统计分析、回归建模 |                         | ✅ lm, glm    |
+| 可视化（交互式）   | ✅ plotly               | ✅ ggplot2    |
+| 可视化（出版级）   |                         | ✅ ggplot2    |
+| 机器学习（传统）   | ✅ sklearn              |               |
+| 深度学习           | ✅ PyTorch / TensorFlow |               |
+| 时间序列分析       |                         | ✅ forecast   |
+| 报表生成           | ✅ nbconvert            | ✅ rmarkdown  |
 
----
+------------------------------------------------------------------------
 
 ## 快速开始
 
 ### 前置要求
 
-- Python 3.10+（建议 Conda 环境，如 `graphrag`）
-- R 4.x + RStudio Server
-- Node.js 18+（JupyterLab 扩展构建用）
-- JupyterLab（建议 JupyterHub）
+-   Python 3.11+（建议 Conda 或VENV环境，如 `graphrag`）
+-   R 4.x + RStudio Server
+-   Node.js 22+（JupyterLab 扩展构建用）
+-   JupyterLab 4.x（建议 JupyterHub）
 
 ### 安装
 
-```bash
+``` bash
 git clone https://github.com/icejean/openclaw_with_jupyterlab_and_rstudio.git
 cd openclaw_with_jupyterlab_and_rstudio
 ```
@@ -309,7 +309,7 @@ cd openclaw_with_jupyterlab_and_rstudio
 各子目录有详细部署说明：
 
 | 目录 | README | 说明 |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `jupyter_mcp/` | [README.md](./jupyter_mcp/README.md) | Jupyter MCP 安装与注册 |
 | `r-session-ai/` | [README.md](./r-session-ai/README.md) | R API 启动与 MCP 配置 |
 
@@ -318,7 +318,7 @@ cd openclaw_with_jupyterlab_and_rstudio
 > 以下知乎专栏文章详细介绍了 OpenClaw 的安装、配置和使用，建议按顺序阅读。
 
 | 主题 | 链接 |
-|---|---|
+|------------------------------------|------------------------------------|
 | 🦞 小龙虾 OpenClaw 安全饲养教程 | [入门篇](https://zhuanlan.zhihu.com/p/2013144472117068259) |
 | 🦞 小龙虾 OpenClaw 安全饲养教程之二：本机部署 | [部署篇](https://zhuanlan.zhihu.com/p/2020880761520227367) |
 | 💬 OpenClaw 主流通讯渠道配置指南 | [飞书 / 微信 / 钉钉](https://zhuanlan.zhihu.com/p/2041198920395658076) |
@@ -328,22 +328,24 @@ cd openclaw_with_jupyterlab_and_rstudio
 | 🏗️ OpenClaw Ubuntu 24 多用户部署方案 | [基础架构](https://zhuanlan.zhihu.com/p/2046116340784697542) |
 | 🏗️ OpenClaw Ubuntu 24 多用户部署方案生产级增强 | [生产级增强](https://zhuanlan.zhihu.com/p/2046909112571662596) |
 
----
+------------------------------------------------------------------------
 
 ## 典型使用流程
 
-1. **启动环境：** 打开 JupyterLab 和 RStudio
-2. **注册 Python 端：** 在 Jupyter cell 中运行 `hook.register()`
-3. **启动 R API：** 在 RStudio Console 中 `source("r-session-ai/r-session-api.R")`
-4. **配置 OpenClaw：** 按自己的环境修改 `openclaw.json` 中的 MCP Server 参数
-5. **开始分析：** 在 OpenClaw 对话中发号施令
+1.  **启动环境：** 打开 JupyterLab 和 RStudio
+2.  **注册 Python 端：** 在 Jupyter cell 中运行 `hook.register()`
+3.  **启动 R API：** 在 RStudio Console 中 `source("r-session-ai/r-session-api.R")`
+4.  **配置 OpenClaw：** 按自己的环境修改 `openclaw.json` 中的 MCP Server 参数
+5.  配置MEMORY.md：按自己的环境修改MEMORY.md
+6.  建议配置Claude Code，Claude可以接入国内LLM，适合配合OpenClaw使用
+7.  **开始分析：** 在 OpenClaw 对话中发号施令
 
----
+------------------------------------------------------------------------
 
 ## License
 
 MIT
 
----
+------------------------------------------------------------------------
 
-> *🐵 大圣出品 —— 让 Python 和 R 在 AI 驱动下高效协作*
+> *🐵 Jean出品 —— 让 Python 和 R 在 AI 驱动下高效协作*
