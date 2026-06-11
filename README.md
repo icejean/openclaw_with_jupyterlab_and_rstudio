@@ -1,4 +1,4 @@
-# Data AI
+# Data AI [English](./README.en.md)
 
 > OpenClaw / Claude Code with Jupyter Lab and Rstudio
 
