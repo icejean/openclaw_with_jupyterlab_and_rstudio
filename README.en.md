@@ -12,12 +12,12 @@ Python and R each have irreplaceable ecosystems. Traditional solutions (like Pos
 
 ### Core Advantages
 
-- 🏠 **Data never leaves the server**, deployable on local networks with all-in-one appliances
-- 🇨🇳 **Verified on domestic IT infrastructure**: Kylin V10 + Kunpeng CPU (ARM64) + full domestic LLMs
-- 🔄 **LLM hot-swappable** (DeepSeek / GLM / MiniMax / Kimi, etc.)
-- 🪶 Lightweight browser interface, easy to deploy and maintain
-- 🔓 Fully open source and free
-- 📊 AI贯穿 **coding phase** + **data analysis phase**
+-   🏠 **Data never leaves the server**, deployable on local networks with all-in-one appliances
+-   🇨🇳 **Verified on domestic IT infrastructure**: Kylin V10 + Kunpeng CPU (ARM64) + full domestic LLMs
+-   🔄 **LLM hot-swappable** (DeepSeek / GLM / MiniMax / Kimi, etc.)
+-   🪶 Lightweight browser interface, easy to deploy and maintain
+-   🔓 Fully open source and free
+-   📊 AI in **coding phase** + **data analysis phase**
 
 ------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ Python and R each have irreplaceable ecosystems. Traditional solutions (like Pos
 
 ### High-Level Architecture
 
-```
+```         
                           ┌──────────────────────┐
                           │  User (Browser UI)   │
                           │ JupyterLab / RStudio │
@@ -65,7 +65,7 @@ Python and R each have irreplaceable ecosystems. Traditional solutions (like Pos
 
 #### ① Python Side (jupyter-mcp)
 
-```
+```         
 OpenClaw Agent
     │ callTool(run_code, ...) ← MCP Protocol
     ▼
@@ -82,7 +82,7 @@ r2py/ Shared Directory  (CSV files)
 
 **Communication Protocol:** `jupyter_client` + ZMQ (Shell / IOPub / Stdin / Control / Heartbeat — 5 channels)
 
-```
+```         
 MCP Server                              Jupyter Kernel
     │    execute_request (Shell)              │
     ├────────────────────────────────────────>│
@@ -99,7 +99,7 @@ MCP Server                              Jupyter Kernel
 
 #### ② R Side (r-session)
 
-```
+```         
 OpenClaw Agent
     │ callTool(run_code, ...) ← MCP Protocol
     ▼
@@ -116,7 +116,7 @@ r2py/ Shared Directory  (CSV files)
 
 **Communication Protocol:** HTTP (`httpx.Client` → `httpuv::startServer`)
 
-```
+```         
 MCP Server                              R API (httpuv)
     │  GET /health                            │
     │  GET /env                               │
@@ -134,7 +134,7 @@ Most solutions (plumber, Rserve) execute code in new processes, meaning they can
 
 #### ③ Cross-Language Data Exchange (r2py)
 
-```
+```         
 R Session                          Jupyter Kernel
     │                                    │
     │  export_data("df")                 │
@@ -153,7 +153,7 @@ R Session                          Jupyter Kernel
 
 ## Project Structure
 
-```
+```         
 openclaw_with_jupyterlab_and_rstudio/
 │
 ├── jupyter_mcp/                     # Python side: Jupyter MCP Server
@@ -211,7 +211,7 @@ openclaw_with_jupyterlab_and_rstudio/
 ### Component Reference
 
 | Component | Language | Runtime | Communication | Target | Operates On |
-|----|----|----|----|----|----|
+|------------|------------|------------|------------|------------|------------|
 | **jupyter-mcp** | Python | graphrag conda | ZMQ (jupyter_client) | Jupyter Kernel | Kernel namespace Python objects |
 | **r-session** | Python | graphrag conda | HTTP (httpx) → httpuv | R API → RStudio R Session | .GlobalEnv R objects |
 | **R API** | R | RStudio same process | httpuv (non-blocking HTTP) | Current R Session | eval() → direct environment access |
@@ -223,7 +223,7 @@ openclaw_with_jupyterlab_and_rstudio/
 #### Python Side (jupyter-mcp)
 
 | Feature | Description |
-|----|----|
+|------------------------------------|------------------------------------|
 | Display location | Notebook Cell / Console window (auto-detected by hook) |
 | Code execution | Sent to kernel via ZMQ |
 | Introspection | Kernel introspection code + `__JUPYTER_MCP_JSON__` marker protocol |
@@ -233,14 +233,14 @@ openclaw_with_jupyterlab_and_rstudio/
 
 #### R Side (r-session)
 
-| Feature | Description |
-|----|----|
-| Display location | RStudio Console + Environment panel + Plots panel |
-| Code execution | eval(parse(text=code)) in .GlobalEnv |
-| Console echo | sink(split=TRUE) real-time echo to Console |
-| Auth | Bearer Token (optional, required for multi-user) |
-| Dependencies | httpuv (R side), httpx + mcp (Python side) |
-| Startup | Run `source("r-session-api.R")` in RStudio Console |
+| Feature          | Description                                        |
+|------------------|----------------------------------------------------|
+| Display location | RStudio Console + Environment panel + Plots panel  |
+| Code execution   | eval(parse(text=code)) in .GlobalEnv               |
+| Console echo     | sink(split=TRUE) real-time echo to Console         |
+| Auth             | Bearer Token (optional, required for multi-user)   |
+| Dependencies     | httpuv (R side), httpx + mcp (Python side)         |
+| Startup          | Run `source("r-session-api.R")` in RStudio Console |
 
 ------------------------------------------------------------------------
 
@@ -248,7 +248,7 @@ openclaw_with_jupyterlab_and_rstudio/
 
 ### Architecture
 
-```
+```         
 R Session                    CSV File                    Jupyter Kernel
     │                           │                            │
     │  fwrite(df, path) ───────>│                            │
@@ -261,7 +261,7 @@ R Session                    CSV File                    Jupyter Kernel
 ### Tools
 
 | Direction | MCP Tools | Internal Implementation |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | R → Python | r-session.export_data → jupyter-mcp.import_data | `data.table::fwrite` → CSV → `pd.read_csv` |
 | Python → R | jupyter-mcp.export_data → r-session.import_data | `pd.to_csv` → CSV → `data.table::fread` |
 
@@ -269,24 +269,24 @@ R Session                    CSV File                    Jupyter Kernel
 
 **Python → R (lossless ✅):**
 
-| Python | R | CSV Intermediate |
-|----|----|----|
-| int64 | integer | `1` |
-| float64 | numeric | `10.5` |
-| object (str) | character | `Alice` |
-| bool | logical | `TRUE` |
-| datetime64 | IDate / POSIXct | `2026-06-07` |
+| Python       | R               | CSV Intermediate |
+|--------------|-----------------|------------------|
+| int64        | integer         | `1`              |
+| float64      | numeric         | `10.5`           |
+| object (str) | character       | `Alice`          |
+| bool         | logical         | `TRUE`           |
+| datetime64   | IDate / POSIXct | `2026-06-07`     |
 
 **R → Python (dates/times need fixing ⚠️):**
 
 | R | CSV | Python | Fix |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | integer/num/char/logical | Native | int64/float64/object/bool ✅ | None needed |
 | IDate / POSIXct | `2026-06-07` | object (string) ❌ | `pd.to_datetime(df['col'])` |
 
 ### Shared Directory
 
-```
+```         
 Default: ~/.openclaw/workspace/r2py/  (per user workspace, naturally isolated)
 Override: R2PY_SHARED_DIR env var
           R_SHARED_DIR (R-side override)
@@ -298,16 +298,16 @@ Filename: UUID prefix + .csv
 
 ## Use Case Matrix
 
-| Scenario | Python (jupyter-mcp) | R (r-session) |
-|----|----|----|
-| Data cleaning, ETL | ✅ pandas | |
-| Statistical analysis, regression | | ✅ lm, glm |
-| Visualization (interactive) | ✅ plotly | ✅ ggplot2 |
-| Visualization (publication) | | ✅ ggplot2 |
-| ML (classical) | ✅ sklearn | |
-| Deep learning | ✅ PyTorch / TensorFlow | |
-| Time series | | ✅ forecast |
-| Report generation | ✅ nbconvert | ✅ rmarkdown |
+| Scenario                         | Python (jupyter-mcp)    | R (r-session) |
+|----------------------------------|-------------------------|---------------|
+| Data cleaning, ETL               | ✅ pandas               |               |
+| Statistical analysis, regression |                         | ✅ lm, glm    |
+| Visualization (interactive)      | ✅ plotly               | ✅ ggplot2    |
+| Visualization (publication)      |                         | ✅ ggplot2    |
+| ML (classical)                   | ✅ sklearn              |               |
+| Deep learning                    | ✅ PyTorch / TensorFlow |               |
+| Time series                      |                         | ✅ forecast   |
+| Report generation                | ✅ nbconvert            | ✅ rmarkdown  |
 
 ------------------------------------------------------------------------
 
@@ -315,10 +315,10 @@ Filename: UUID prefix + .csv
 
 ### Prerequisites
 
-- Python 3.11+ (Conda or VENV environment recommended, e.g. `graphrag`)
-- R 4.x + RStudio Server
-- Node.js 22+ (for building JupyterLab extensions)
-- JupyterLab 4.x (JupyterHub recommended)
+-   Python 3.11+ (Conda or VENV environment recommended, e.g. `graphrag`)
+-   R 4.x + RStudio Server
+-   Node.js 22+ (for building JupyterLab extensions)
+-   JupyterLab 4.x (JupyterHub recommended)
 
 ### Installation
 
@@ -330,7 +330,7 @@ cd openclaw_with_jupyterlab_and_rstudio
 Subdirectory deployment guides:
 
 | Directory | README | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `jupyter_mcp/` | [README.md](./jupyter_mcp/README.md) | Jupyter MCP install & register |
 | `r-session-ai/` | [README.md](./r-session-ai/README.md) | R API startup & MCP config |
 
@@ -354,14 +354,14 @@ In this mode, OpenClaw runs as an embedded process, **does not start gateway or 
 
 CSV-based data exchange between RStudio and Jupyter Lab is suitable only for **small to medium intermediate datasets**. Large datasets should be processed within their original session to avoid I/O and type conversion overhead.
 
----
+------------------------------------------------------------------------
 
 ### JupyterLab Extension Installation
 
 This repository includes complete source code for two JupyterLab 4.x extensions in the project root:
 
-- `jupyterlab-auto-reload/` — Auto-refresh Notebook (3s after MCP writes)
-- `jupyterlab-console-adopt/` — External session echo in Console (.py source mode)
+-   `jupyterlab-auto-reload/` — Auto-refresh Notebook (3s after MCP writes)
+-   `jupyterlab-console-adopt/` — External session echo in Console (.py source mode)
 
 Each extension contains TypeScript source (`src/`), compiled output (`lib/`), and build artifacts (`jupyterlab_*/labextension/`).
 
@@ -422,7 +422,7 @@ Restart JupyterLab after installation for changes to take effect. For JupyterHub
 > The following Zhihu (知乎) article series provide a comprehensive guide to OpenClaw installation, configuration, and usage.
 
 | Topic | Link |
-|----|----|
+|------------------------------------|------------------------------------|
 | 🦞 OpenClaw Safe Keeping Tutorial (Part 1) | [Getting Started](https://zhuanlan.zhihu.com/p/2013144472117068259) |
 | 🦞 OpenClaw Safe Keeping Tutorial (Part 2) | [Local Deployment](https://zhuanlan.zhihu.com/p/2020880761520227367) |
 | 💬 OpenClaw Communication Channel Guide | [Feishu / WeChat / DingTalk](https://zhuanlan.zhihu.com/p/2041198920395658076) |
@@ -436,13 +436,13 @@ Restart JupyterLab after installation for changes to take effect. For JupyterHub
 
 ## Typical Workflow
 
-1. **Start the environment:** Open JupyterLab and RStudio
-2. **Register Python side:** Run `hook.register()` in a Jupyter cell
-3. **Start R API:** Run `source("r-session-ai/r-session-api.R")` in RStudio Console
-4. **Configure OpenClaw:** Modify MCP Server parameters in `openclaw.json` for your environment
-5. **Configure MEMORY.md:** Adapt `MEMORY.md` to your environment
-6. **Configure Claude Code (recommended):** Claude can access domestic LLMs, works well with OpenClaw
-7. **Start analyzing:** Give commands to OpenClaw via conversation
+1.  **Start the environment:** Open JupyterLab and RStudio
+2.  **Register Python side:** Run `hook.register()` in a Jupyter cell
+3.  **Start R API:** Run `source("r-session-ai/r-session-api.R")` in RStudio Console
+4.  **Configure OpenClaw:** Modify MCP Server parameters in `openclaw.json` for your environment
+5.  **Configure MEMORY.md:** Adapt `MEMORY.md` to your environment
+6.  **Configure Claude Code (recommended):** Claude can access domestic LLMs, works well with OpenClaw
+7.  **Start analyzing:** Give commands to OpenClaw via conversation
 
 ------------------------------------------------------------------------
 
@@ -451,7 +451,7 @@ Restart JupyterLab after installation for changes to take effect. For JupyterHub
 Refer to the following docs for multi-user production deployment:
 
 | Topic | Link |
-|----|----|
+|------------------------------------|------------------------------------|
 | 🏗️ OpenClaw Ubuntu 24 Multi-User Deployment | [Basic Architecture](https://zhuanlan.zhihu.com/p/2046116340784697542) |
 | 🏗️ OpenClaw Ubuntu 24 Multi-User Deployment (Enhanced) | [Production-Grade Enhancement](https://zhuanlan.zhihu.com/p/2046909112571662596) |
 
@@ -460,7 +460,7 @@ Refer to the following docs for multi-user production deployment:
 The system's production security measures span the following layers:
 
 | Layer | Measure | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **Network** | `127.0.0.1` only | R API, MCP Server (stdio mode = no network port), Jupyter MCP all listen only on loopback |
 | **Authentication** | Bearer Token | All R API requests verify Token; `openclaw.json` MCP Server configures the same Token; mismatch returns 401 |
 | **Process** | stdio subprocess isolation | Each user's MCP Server is an independent OS subprocess, mutually invisible, no network port consumed |
@@ -479,11 +479,11 @@ The system's production security measures span the following layers:
 >
 > Entirely orchestrated via OpenClaw through WeChat on a mobile phone — zero manual coding.
 
-**Data source:** [Kaggle: Melbourne Housing Market](https://www.kaggle.com/datasets/anthonypino/melbourne-housing-market) (~35,000 property transaction records)
+**Data source:** [Kaggle: Melbourne Housing Market](https://www.kaggle.com/datasets/anthonypino/melbourne-housing-market) (\~35,000 property transaction records)
 
 **Workflow:** Data preprocessing → RStudio loads housing data → explore/statistics/plot → export CSV to Jupyter Lab → LightGBM regression → predict → send results back to RStudio → plot actual vs predicted values
 
-```
+```         
 Traditional ML code (preprocessing + model training & tuning)
     │  (hyperparameter tuning done in local scripts, time-consuming)
     ▼
@@ -496,7 +496,7 @@ OpenClaw LLM AI orchestration (22 steps)
 > In this demo, OpenClaw uses LightGBM with default parameters for simple fitting. Hyperparameter tuning is traditional ML engineering outside the demo scope.
 
 | Phase | Tool | Steps |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | RStudio EDA: load/preview/stats/plot | r-session | 1-7 |
 | R → CSV export | r-session.export_data | 8 |
 | CSV → Python import | jupyter-mcp.import_data | 9-10 |
@@ -511,7 +511,7 @@ Full code, data, and 22-step mobile screenshots: [`example/`](./example/README.m
 ## Dependency Summary
 
 | Component | Required Packages | Installation Command |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **jupyter-mcp** (MCP Server) | `mcp`, `jupyter-client` | `pip install mcp jupyter-client` |
 | **r-session-mcp** (MCP Server) | `mcp`, `httpx` | `pip install mcp httpx` |
 | **R API Server** (R side) | `httpuv`, `jsonlite` | `install.packages(c("httpuv", "jsonlite"))` |
@@ -527,7 +527,7 @@ Full code, data, and 22-step mobile screenshots: [`example/`](./example/README.m
 ### jupyter-mcp MCP Server
 
 | Variable | Default | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `JUPYTER_MCP_HOST` | `127.0.0.1` | MCP Server listen address (for HTTP mode; stdio mode doesn't listen) |
 | `JUPYTER_MCP_PORT` | `0` | MCP Server port; `0` = stdio mode (recommended) |
 | `JUPYTER_MCP_TIMEOUT` | `120` | Kernel code execution timeout (seconds) |
@@ -535,17 +535,17 @@ Full code, data, and 22-step mobile screenshots: [`example/`](./example/README.m
 
 ### r-session MCP Server
 
-| Variable | Default | Description |
-|----|----|----|
-| `R_API_HOST` | `127.0.0.1` | R API address |
-| `R_API_PORT` | `8161` | R API port |
-| `R_API_TOKEN` | Empty | R API auth Token (empty = disabled) |
-| `MCP_PORT` | `0` | MCP Server port; `0` = stdio mode (recommended) |
+| Variable      | Default     | Description                                     |
+|---------------|-------------|-------------------------------------------------|
+| `R_API_HOST`  | `127.0.0.1` | R API address                                   |
+| `R_API_PORT`  | `8161`      | R API port                                      |
+| `R_API_TOKEN` | Empty       | R API auth Token (empty = disabled)             |
+| `MCP_PORT`    | `0`         | MCP Server port; `0` = stdio mode (recommended) |
 
 ### R API Server (r-session-api.R)
 
 | Variable / option | Default | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `options(rsession_api_port = ...)` or `R_API_PORT` | `8161` | httpuv listen port |
 | `options(rsession_api_host = ...)` | `127.0.0.1` | Listen address |
 | `options(rsession_api_max_rows = ...)` | `100` | Max preview rows |
@@ -557,7 +557,7 @@ Full code, data, and 22-step mobile screenshots: [`example/`](./example/README.m
 ### Shared Directory
 
 | Variable | Default | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `R2PY_SHARED_DIR` | `~/.openclaw/workspace/r2py/` | R↔Python shared directory (master entry) |
 | `R_SHARED_DIR` | Same as `R2PY_SHARED_DIR` | R-side override |
 | `JUPYTER_SHARED_DIR` | Same as `R2PY_SHARED_DIR` | Python-side override |
@@ -604,8 +604,8 @@ Consider keeping important objects in separate environments, or avoid using `rm(
 
 A global proxy configuration (e.g., Clash's `ALL_PROXY=socks5://...`) may cause:
 
-- **r-session MCP Server** startup failure — `httpx.Client()` initialization crashes. MCP Server auto-cleans proxy env vars on startup
-- **jupyter-mcp** NotebookClient writing .ipynb via REST API goes through proxy — auto-masked temporarily
+-   **r-session MCP Server** startup failure — `httpx.Client()` initialization crashes. MCP Server auto-cleans proxy env vars on startup
+-   **jupyter-mcp** NotebookClient writing .ipynb via REST API goes through proxy — auto-masked temporarily
 
 If you encounter proxy issues during manual debugging, temporarily clear proxy env vars:
 
