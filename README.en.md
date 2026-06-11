@@ -95,7 +95,7 @@ MCP Server                              Jupyter Kernel
     │<────────────────────────────────────────┤
 ```
 
-> Detailed architecture doc: [jupyter_mcp/jupyter-mcp-architecture.md](./jupyter_mcp/jupyter-mcp-architecture.md)
+> Detailed architecture doc: [jupyter_mcp/jupyter-mcp-architecture.en.md](./jupyter_mcp/jupyter-mcp-architecture.en.md)
 
 #### ② R Side (r-session)
 
@@ -130,7 +130,7 @@ MCP Server                              R API (httpuv)
 
 Most solutions (plumber, Rserve) execute code in new processes, meaning they can't access variables in the current RStudio session and created objects don't appear in the Environment panel. httpuv is based on the libuv event loop, **sharing the same process** as the R Console without blocking the main thread — variables stay synchronized across all three surfaces.
 
-> Detailed architecture doc: [r-session-ai/r-session-architecture.md](./r-session-ai/r-session-architecture.md)
+> Detailed architecture doc: [r-session-ai/r-session-architecture.en.md](./r-session-ai/r-session-architecture.en.md)
 
 #### ③ Cross-Language Data Exchange (r2py)
 
@@ -331,8 +331,8 @@ Subdirectory deployment guides:
 
 | Directory | README | Description |
 |------------------------|------------------------|------------------------|
-| `jupyter_mcp/` | [README.md](./jupyter_mcp/README.md) | Jupyter MCP install & register |
-| `r-session-ai/` | [README.md](./r-session-ai/README.md) | R API startup & MCP config |
+| `jupyter_mcp/` | [README.en.md](./jupyter_mcp/README.en.md) | Jupyter MCP install & register |
+| `r-session-ai/` | [README.en.md](./r-session-ai/README.en.md) | R API startup & MCP config |
 
 ### Recommended Usage
 
@@ -469,7 +469,7 @@ The system's production security measures span the following layers:
 | **Data** | Data stays on-premises | Entirely local network communication, CSV written to local disk, no external services |
 | **Token storage** | In-memory | R API Token set via `options()` in R memory, not persisted to disk; config file Token managed by OpenClaw |
 
-> Detailed Token auth flow: see the Security section in [r-session-ai/README.md](./r-session-ai/README.md#security)
+> Detailed Token auth flow: see the Security section in [r-session-ai/README.en.md](./r-session-ai/README.en.md#security)
 
 ------------------------------------------------------------------------
 
@@ -504,7 +504,7 @@ OpenClaw LLM AI orchestration (22 steps)
 | Python → CSV export | jupyter-mcp.export_data | 18 |
 | CSV → R import → comparison plot | r-session.import_data / run_code | 19-22 |
 
-Full code, data, and 22-step mobile screenshots: [`example/`](./example/README.md)
+Full code, data, and 22-step mobile screenshots: [`example/`](./example/README.en.md)
 
 ------------------------------------------------------------------------
 
